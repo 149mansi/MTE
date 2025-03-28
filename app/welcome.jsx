@@ -19,8 +19,8 @@ const welcome = () => {
 
 {/* title */}
       <View style={{gap:10}}>
-      <Text style={styles.title}>LinkUp!</Text>
-      <Text style={styles.punchline}>Where every thought finds a home and every image tells a story</Text>
+      <Text style={styles.title}>MTE Builder</Text>
+      <Text style={styles.punchline}>Streamlining your Monthly Thinking Exercises into success</Text>
 
       </View>
       {/* footer */}

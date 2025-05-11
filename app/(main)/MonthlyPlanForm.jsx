@@ -1,6 +1,10 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, Button, ScrollView } from "react-native";
-import { Link } from "expo-router";
+import { View, Text, TextInput, StyleSheet, Button, ScrollView, Alert } from "react-native";
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
+import { Link, useRouter, useLocalSearchParams } from "expo-router";
+import { generateExcelFile } from "../../utils/generateExcelFile";
+import { supabase } from "../../lib/supabase"; // Make sure this is correct
 
 const MonthlyPlanForm = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +13,10 @@ const MonthlyPlanForm = () => {
     counselingPlan: "",
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const { studentInfo } = useLocalSearchParams(); // Previous data
+
   const handleInputChange = (key, value) => {
     setFormData((prevState) => ({
       ...prevState,
@@ -16,14 +24,61 @@ const MonthlyPlanForm = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log("Form Submitted:", formData);
-    // Add your submission logic here
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+      const completeData = {
+        ...studentInfo,
+        ...formData,
+      };
+
+      console.log("Generating Excel with data:", completeData);
+      const fileUri = await generateExcelFile(completeData); // generateExcelFile should return file URI
+
+      // Share / download the file
+      if (await Sharing.isAvailableAsync()) {
+        await Sharing.shareAsync(fileUri);
+      } else {
+        Alert.alert("File Ready", "File saved but cannot be shared.");
+      }
+
+      // Upload to Supabase
+      const fileName = fileUri.split("/").pop();
+      const fileContent = await FileSystem.readAsStringAsync(fileUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const { data, error } = await supabase.storage
+        .from("monthly-forms") // Your bucket name
+        .upload(`plans/${fileName}`, Buffer.from(fileContent, "base64"), {
+          contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          upsert: true,
+        });
+
+      if (error) throw error;
+
+      Alert.alert("Success", "Form submitted and file uploaded!");
+
+      // Clear the form
+      setFormData({
+        actionPlan: "",
+        mentorComments: "",
+        counselingPlan: "",
+      });
+
+      // Redirect to home page
+      router.replace("/Home");
+
+    } catch (error) {
+      console.error("Submission Error:", error);
+      Alert.alert("Error", "Something went wrong during submission.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <ScrollView style={styles.container}>
-      {/* Section 1: Action Plan for the Coming Month */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Action Plan for the Coming Month</Text>
         <TextInput
@@ -35,7 +90,6 @@ const MonthlyPlanForm = () => {
         />
       </View>
 
-      {/* Section 2: Comments by the Mentor */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Comments by the Mentor</Text>
         <TextInput
@@ -47,7 +101,6 @@ const MonthlyPlanForm = () => {
         />
       </View>
 
-      {/* Section 3: Action Plan Based on the Counseling */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Action Plan Based on the Counseling</Text>
         <TextInput
@@ -59,21 +112,22 @@ const MonthlyPlanForm = () => {
         />
       </View>
 
-      {/* Navigation Buttons */}
       <View style={styles.buttonContainer}>
-        {/* Previous Button */}
         <Link
           href={{
-            pathname: "/FriendsAndEssayForm", // Navigate to the FriendsAndEssayForm page
-            params: { studentInfo: formData }, // Pass current form data
+            pathname: "/FriendsAndEssayForm",
+            params: { studentInfo: formData },
           }}
           style={styles.link}
         >
           <Text style={styles.previousButton}>Previous</Text>
         </Link>
-
-        {/* Submit Button */}
-        <Button title="Submit" onPress={handleSubmit} color="#4CAF50" />
+        <Button
+          title={isSubmitting ? "Submitting..." : "Submit & Download"}
+          onPress={handleSubmit}
+          color="#4CAF50"
+          disabled={isSubmitting}
+        />
       </View>
     </ScrollView>
   );
@@ -103,7 +157,7 @@ const styles = StyleSheet.create({
     padding: 10,
     minHeight: 50,
     backgroundColor: "#fff",
-    textAlignVertical: "top", // Ensures text starts at the top for multiline inputs
+    textAlignVertical: "top",
   },
   buttonContainer: {
     marginTop: 20,
@@ -123,3 +177,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+  

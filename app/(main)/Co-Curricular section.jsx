@@ -61,6 +61,12 @@ const CoCurricularsection = () => {
     }
   };
 
+  const handlePrevious = () => {
+    if (currentSection > 0) {
+      setCurrentSection((prev) => prev - 1);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {sections[currentSection] && (
@@ -76,67 +82,44 @@ const CoCurricularsection = () => {
         </View>
       )}
 
-      {currentSection === sections.length - 1 ? ( // Difficulties Section
-        <View style={styles.buttonContainer}>
-          <Button
-            title="Previous"
-            onPress={() => setCurrentSection((prev) => prev - 1)}
-            color="#FF6F61"
-          />
-          <Link
-            href={{
-              pathname: '/HealthAndReading', // Navigate to HealthAndReading
-              params: { studentInfo }, // Pass studentInfo
-            }}
-            style={styles.link}
-          >
-            <Text style={styles.nextButton}>Next</Text>
-          </Link>
+      <View style={styles.buttonContainer}>
+        <View style={styles.buttonWrapper}>
+          {currentSection === 0 ? (
+            <Link
+              href={{ pathname: '/AcademicProgress', params: { studentInfo } }}
+              style={styles.link}
+            >
+              <Text style={styles.nextButton}>Previous</Text>
+            </Link>
+          ) : (
+            <Button title="Previous" onPress={handlePrevious} color="#FF6F61" />
+          )}
         </View>
-      ) : currentSection === 0 ? ( // Real Life Project Section
-        <View style={styles.buttonContainer}>
-          <Link
-            href={{
-              pathname: '/AcademicProgress', // Navigate to Academic Progress
-              params: { studentInfo }, // Pass studentInfo
-            }}
-            style={styles.link}
-          >
-            <Text style={styles.nextButton}>Previous</Text>
-          </Link>
-          <Button
-            title="Next"
-            onPress={handleNext} // Proceed to the next section
-            color="#FF6F61"
-          />
+        <View style={styles.buttonWrapper}>
+          {currentSection < sections.length - 1 ? (
+            <Button title="Next" onPress={handleNext} color="#FF6F61" />
+          ) : (
+            <Link
+              href={{ pathname: '/HealthAndReading', params: { studentInfo } }}
+              style={styles.link}
+            >
+              <Text style={styles.nextButton}>Next</Text>
+            </Link>
+          )}
         </View>
-      ) : (
-        <View style={styles.buttonContainer}>
-          <Button
-            title="Previous"
-            onPress={() => setCurrentSection((prev) => prev - 1)}
-            color="#FF6F61"
-          />
-          <Button
-            title="Next"
-            onPress={handleNext}
-            color="#FF6F61"
-          />
-        </View>
-      )}
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-  flex: 1,
-  justifyContent: 'center', // Center content vertically
-  alignItems: 'center', // Center content horizontally
-  padding: 20,
-  backgroundColor: '#f8f8f8',
-},
-
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#f8f8f8',
+  },
   section: {
     marginBottom: 20,
   },
@@ -153,12 +136,17 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     backgroundColor: '#fff',
+    minWidth: 300,
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
   },
-  
+  buttonWrapper: {
+    marginHorizontal: 10,
+  },
   link: {
     padding: 10,
     backgroundColor: '#FF6F61',

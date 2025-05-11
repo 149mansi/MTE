@@ -1,9 +1,9 @@
-import { View, Text } from 'react-native'
+// import { View, Text } from 'react-native'
 import React, { useEffect } from 'react'
 import { Stack, useRouter } from 'expo-router'
 import { AuthProvider, useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
-import { useRoute } from '@react-navigation/native'
+// import { useRoute } from '@react-navigation/native'
 import { getUserData } from '../services/userService'
 
 const _layout=()=>{

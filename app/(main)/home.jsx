@@ -2,13 +2,14 @@ import { Alert, StyleSheet, Text, View, TextInput } from 'react-native';
 import React, { useState } from 'react';
 import ScreenWrapper from '../../components/screenWrapper'; // Adjusted relative path
 import { Picker } from '@react-native-picker/picker'; // Dropdown Picker component
-import { Link } from 'expo-router'; // Using expo-router's Link component
+import { useRouter } from 'expo-router'; // Improved navigation
 import { useAuth } from '../../contexts/AuthContext'; // Ensure 'useAuth' is exported
 import { supabase } from '../../lib/supabase'; // Ensure 'supabase' is exported
 import { Button } from 'react-native';
 
 const Home = () => {
   const { setAuth } = useAuth();
+  const router = useRouter();
   const [studentInfo, setStudentInfo] = useState({
     thinkingExercise: "",
     month: "",
@@ -24,10 +25,16 @@ const Home = () => {
   };
 
   const onLogout = async () => {
-    setAuth(null);
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      Alert.alert('Sign out', "Error signing out!");
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+
+      setAuth(null);
+      Alert.alert('Success', 'You have been logged out.');
+      router.replace('/login'); // Redirect to login page after logout
+    } catch (error) {
+      console.error("Logout Error:", error);
+      Alert.alert('Sign out', `Error signing out: ${error.message}`);
     }
   };
 
@@ -58,18 +65,12 @@ const Home = () => {
                 onValueChange={(value) => handleInputChange("month", value)}
               >
                 <Picker.Item label="Select a month" value="" />
-                <Picker.Item label="January" value="January" />
-                <Picker.Item label="February" value="February" />
-                <Picker.Item label="March" value="March" />
-                <Picker.Item label="April" value="April" />
-                <Picker.Item label="May" value="May" />
-                <Picker.Item label="June" value="June" />
-                <Picker.Item label="July" value="July" />
-                <Picker.Item label="August" value="August" />
-                <Picker.Item label="September" value="September" />
-                <Picker.Item label="October" value="October" />
-                <Picker.Item label="November" value="November" />
-                <Picker.Item label="December" value="December" />
+                {[
+                  "January", "February", "March", "April", "May", "June",
+                  "July", "August", "September", "October", "November", "December"
+                ].map((month) => (
+                  <Picker.Item key={month} label={month} value={month} />
+                ))}
               </Picker>
             </View>
           </View>
@@ -96,15 +97,11 @@ const Home = () => {
         {/* Navigation Buttons */}
         <View style={styles.buttonContainer}>
           <Button title="Previous" onPress={onPrevious} color="#FF6F61" />
-          <Link
-            href={{
-              pathname: '/AcademicProgress',
-              params: { studentInfo },
-            }}
-            style={styles.link}
-          >
-            <Text style={styles.nextButton}>Next</Text>
-          </Link>
+          <Button
+            title="Next"
+            onPress={() => router.push({ pathname: '/AcademicProgress', params: studentInfo })}
+            color="#4CAF50"
+          />
         </View>
 
         {/* Logout Button */}
@@ -166,15 +163,5 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginTop: 10,
-  },
-  link: {
-    flex: 1,
-    alignItems: "center",
-  },
-  nextButton: {
-    color: "#4CAF50",
-    fontSize: 16,
-    fontWeight: "bold",
-    textAlign: "center",
   },
 });

@@ -1,50 +1,60 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { Link } from 'expo-router'; // Assuming you're using Expo Router
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { Link } from "expo-router"; // Assuming you're using Expo Router
+import { useAppData } from "../../contexts/AppDataContext"; // Import global state
 
-const CoCurricularsection = () => {
+const CoCurricularsection = ({ route }) => {
+  const { updateSectionData } = useAppData(); // Get global state update function
+  const academicData = route?.params?.academicData || {}; // Get academic data from previous page
+
   const [currentSection, setCurrentSection] = useState(0);
   const [combinedData, setCombinedData] = useState({
-    realLifeProject: '',
-    extraEnglish: '',
-    coCurricularPlan: '',
-    examResults: '',
-    financialRequirements: '',
-    difficulties: '',
+    realLifeProject: "",
+    extraEnglish: "",
+    coCurricularPlan: "",
+    examResults: "",
+    financialRequirements: "",
+    difficulties: "",
+    ...academicData, // Pre-populate with any passed academic data
   });
-
-  const studentInfo = { name: 'John Doe', age: 20 }; // Example student info
 
   const sections = [
     {
-      label: 'Real Life Project:',
-      key: 'realLifeProject',
-      placeholder: 'Enter your real-life project details',
+      label: "Real Life Project:",
+      key: "realLifeProject",
+      placeholder: "Enter your real-life project details",
     },
     {
-      label: 'Extra English:',
-      key: 'extraEnglish',
-      placeholder: 'Enter your extra English details',
+      label: "Extra English:",
+      key: "extraEnglish",
+      placeholder: "Enter your extra English details",
     },
     {
-      label: 'Co-Curricular Plan:',
-      key: 'coCurricularPlan',
-      placeholder: 'Enter your co-curricular plan',
+      label: "Co-Curricular Plan:",
+      key: "coCurricularPlan",
+      placeholder: "Enter your co-curricular plan",
     },
     {
-      label: 'Results of the exams (Regular college/university and other exams):',
-      key: 'examResults',
-      placeholder: 'Enter your exam results',
+      label: "Results of the exams (Regular college/university and other exams):",
+      key: "examResults",
+      placeholder: "Enter your exam results",
     },
     {
-      label: 'Financial Requirements for the next 3 months (Details Please):',
-      key: 'financialRequirements',
-      placeholder: 'Enter your financial requirements',
+      label: "Financial Requirements for the next 3 months (Details Please):",
+      key: "financialRequirements",
+      placeholder: "Enter your financial requirements",
     },
     {
-      label: 'Difficulties (Social, Family, etc.):',
-      key: 'difficulties',
-      placeholder: 'Enter the difficulties you face',
+      label: "Difficulties (Social, Family, etc.):",
+      key: "difficulties",
+      placeholder: "Enter the difficulties you face",
     },
   ];
 
@@ -67,6 +77,17 @@ const CoCurricularsection = () => {
     }
   };
 
+  const handleSave = () => {
+    alert("Data saved successfully!");
+
+    // Save the current combinedData to global state
+    if (updateSectionData) {
+      updateSectionData("coCurricular", combinedData);
+    }
+
+    // You can add logic for file generation or further actions here
+  };
+
   return (
     <View style={styles.container}>
       {sections[currentSection] && (
@@ -86,7 +107,10 @@ const CoCurricularsection = () => {
         <View style={styles.buttonWrapper}>
           {currentSection === 0 ? (
             <Link
-              href={{ pathname: '/AcademicProgress', params: { studentInfo } }}
+              href={{
+                pathname: "/AcademicProgress",
+                params: { combinedData },
+              }}
               style={styles.link}
             >
               <Text style={styles.nextButton}>Previous</Text>
@@ -100,7 +124,10 @@ const CoCurricularsection = () => {
             <Button title="Next" onPress={handleNext} color="#FF6F61" />
           ) : (
             <Link
-              href={{ pathname: '/HealthAndReading', params: { studentInfo } }}
+              href={{
+                pathname: "/HealthAndReading",
+                params: { combinedData },
+              }}
               style={styles.link}
             >
               <Text style={styles.nextButton}>Next</Text>
@@ -108,6 +135,12 @@ const CoCurricularsection = () => {
           )}
         </View>
       </View>
+
+      {currentSection === sections.length - 1 && (
+        <TouchableOpacity style={styles.generateButton} onPress={handleSave}>
+          <Text style={styles.generateButtonText}>Save Data</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -115,33 +148,33 @@ const CoCurricularsection = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
-    backgroundColor: '#f8f8f8',
+    backgroundColor: "#f8f8f8",
   },
   section: {
     marginBottom: 20,
   },
   label: {
     fontSize: 18,
-    fontWeight: 'bold',
+ fontWeight: "bold",
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     minWidth: 300,
   },
   buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: 20,
   },
   buttonWrapper: {
@@ -149,15 +182,28 @@ const styles = StyleSheet.create({
   },
   link: {
     padding: 10,
-    backgroundColor: '#FF6F61',
+    backgroundColor: "#FF6F61",
     borderRadius: 5,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   nextButton: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+  },
+  generateButton: {
+    marginTop: 20,
+    backgroundColor: "#28a745",
+    padding: 15,
+    borderRadius: 5,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  generateButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 

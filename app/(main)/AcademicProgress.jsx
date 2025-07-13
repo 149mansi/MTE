@@ -403,7 +403,7 @@
 
 
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -411,11 +411,14 @@ import {
   StyleSheet,
   FlatList,
   TouchableOpacity,
+  Alert,
 } from "react-native";
-import { Link } from "expo-router"; // Replace with your navigation library if not using expo-router
-import { generateExcelFile } from "../../utils/generateExcelFile";
+import { useAppData } from "../../contexts/AppDataContext"; // Import global state
+import { useRouter } from "expo-router"; // Update based on your navigation library
 
 const AcademicProgress = () => {
+  const router = useRouter();
+  const { sectionData, updateSectionData } = useAppData(); // Global state function
   const [rows, setRows] = useState([
     {
       id: 1,
@@ -425,6 +428,15 @@ const AcademicProgress = () => {
     },
     { id: 2, subject: "", selfAssessment: "", justification: "" },
   ]);
+  const [homeData, setHomeData] = useState(null); // To store data from Home page
+
+  useEffect(() => {
+    // Access saved data from Home page and store it in local state
+    const savedHomeData = sectionData?.home;
+    if (savedHomeData) {
+      setHomeData(savedHomeData); // Save Home page data locally
+    }
+  }, [sectionData]); // Re-run when sectionData changes
 
   const handleAddRow = () => {
     setRows((prevRows) => [
@@ -440,7 +452,7 @@ const AcademicProgress = () => {
 
   const handleDeleteRow = (id) => {
     if (id === 1) {
-      alert("Cannot delete the header row.");
+      Alert.alert("Action Denied", "Cannot delete the header row.");
       return;
     }
     setRows((prevRows) => prevRows.filter((row) => row.id !== id));
@@ -453,6 +465,10 @@ const AcademicProgress = () => {
       )
     );
   };
+
+  useEffect(() => {
+    updateSectionData("academicProgress", rows); // Save to global state
+  }, [rows]);
 
   const renderRow = ({ item }) => (
     <View style={styles.row}>
@@ -491,6 +507,19 @@ const AcademicProgress = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Academic Progress</Text>
+
+      {/* Display Home Data if available */}
+      {homeData && (
+        <View style={styles.homeDataContainer}>
+          <Text style={styles.homeDataText}>
+            Thinking Exercise: {homeData.thinkingExercise}
+          </Text>
+          <Text style={styles.homeDataText}>Month: {homeData.month}</Text>
+          <Text style={styles.homeDataText}>College: {homeData.college}</Text>
+          <Text style={styles.homeDataText}>Year of Study: {homeData.yearOfStudy}</Text>
+        </View>
+      )}
+
       <FlatList
         data={rows}
         renderItem={renderRow}
@@ -500,12 +529,18 @@ const AcademicProgress = () => {
         <Text style={styles.addButtonText}>Add Row</Text>
       </TouchableOpacity>
       <View style={styles.navigationButtons}>
-        <Link href="/home" style={styles.previousButton}>
+        <TouchableOpacity
+          style={styles.previousButton}
+          onPress={() => router.push("/home")}
+        >
           <Text style={styles.buttonText}>Previous</Text>
-        </Link>
-        <Link href="/Co-Curricular section" style={styles.nextButton}>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.nextButton}
+          onPress={() => router.push("/Co-Curricular section")}
+        >
           <Text style={styles.buttonText}>Next</Text>
-        </Link>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -589,5 +624,16 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  homeDataContainer: {
+    backgroundColor: "#f1f1f1",
+    padding: 10,
+    marginBottom: 20,
+    borderRadius: 5,
+  },
+  homeDataText: {
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 5,
   },
 });

@@ -1,21 +1,31 @@
-import { Alert, StyleSheet, Text, View, TextInput } from 'react-native';
-import React, { useState } from 'react';
-import ScreenWrapper from '../../components/screenWrapper'; // Adjusted relative path
-import { Picker } from '@react-native-picker/picker'; // Dropdown Picker component
-import { useRouter } from 'expo-router'; // Improved navigation
-import { useAuth } from '../../contexts/AuthContext'; // Ensure 'useAuth' is exported
-import { supabase } from '../../lib/supabase'; // Ensure 'supabase' is exported
-import { Button } from 'react-native';
+import React, { useState, useEffect } from "react";
+import { Alert, StyleSheet, Text, View, TextInput, Button } from "react-native";
+import { Picker } from "@react-native-picker/picker";
+import { useRouter } from "expo-router";
+import ScreenWrapper from "../../components/screenWrapper";
+import { useAuth } from "../../contexts/AuthContext";
+import { supabase } from "../../lib/supabase";
+import { useAppData } from "../../contexts/AppDataContext";
 
 const Home = () => {
   const { setAuth } = useAuth();
+  const { sectionData, updateSectionData } = useAppData(); // Use global state
   const router = useRouter();
+
   const [studentInfo, setStudentInfo] = useState({
     thinkingExercise: "",
     month: "",
     college: "",
     yearOfStudy: "",
   });
+
+  useEffect(() => {
+    // Load previously saved data when the component mounts
+    const savedData = sectionData?.home;
+    if (savedData) {
+      setStudentInfo(savedData);
+    }
+  }, [sectionData]);
 
   const handleInputChange = (field, value) => {
     setStudentInfo((prev) => ({
@@ -24,37 +34,73 @@ const Home = () => {
     }));
   };
 
+  const saveDataToGlobalState = () => {
+    if (updateSectionData && typeof updateSectionData === "function") {
+      try {
+        updateSectionData("home", studentInfo);
+        console.log("Global state updated with:", studentInfo);
+      } catch (error) {
+        console.error("Error updating global state:", error);
+        Alert.alert("Error", "Failed to save data to global state.");
+      }
+    } else {
+      console.error("updateSectionData is not a function or undefined.");
+      Alert.alert("Error", "Global state update function is unavailable.");
+    }
+  };
+
+  const validateFields = () => {
+    const { thinkingExercise, month, college, yearOfStudy } = studentInfo;
+    if (!thinkingExercise || !month || !college || !yearOfStudy) {
+      Alert.alert("Validation Error", "Please fill in all required fields.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    if (validateFields()) {
+      saveDataToGlobalState(); // Save to global state
+      router.push("/AcademicProgress"); // Navigate to next page
+    }
+  };
+
   const onLogout = async () => {
     try {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
       setAuth(null);
-      Alert.alert('Success', 'You have been logged out.');
-      router.replace('/login'); // Redirect to login page after logout
+      Alert.alert("Success", "You have been logged out.");
+      router.replace("/login");
     } catch (error) {
       console.error("Logout Error:", error);
-      Alert.alert('Sign out', `Error signing out: ${error.message}`);
+      Alert.alert("Sign out", `Error signing out: ${error.message}`);
     }
   };
 
   const onPrevious = () => {
-    Alert.alert("Navigation", "You are on the first page."); // Message for the user
+    Alert.alert("Navigation", "You are on the first page.");
   };
+
+  useEffect(() => {
+    saveDataToGlobalState(); // Ensure data is saved when studentInfo changes
+  }, [studentInfo]);
 
   return (
     <ScreenWrapper>
       <View style={styles.container}>
-        {/* Personal Information Section */}
         <View style={styles.card}>
           <Text style={styles.title}>Personal Information</Text>
           <View style={styles.field}>
             <Text style={styles.label}>Thinking Exercise:</Text>
             <TextInput
               style={styles.input}
-              placeholder="Enter Thinking Exercise"
+              placeholder="Name of Student"
               value={studentInfo.thinkingExercise}
-              onChangeText={(text) => handleInputChange("thinkingExercise", text)}
+              onChangeText={(text) =>
+                handleInputChange("thinkingExercise", text)
+              }
             />
           </View>
           <View style={styles.field}>
@@ -66,8 +112,18 @@ const Home = () => {
               >
                 <Picker.Item label="Select a month" value="" />
                 {[
-                  "January", "February", "March", "April", "May", "June",
-                  "July", "August", "September", "October", "November", "December"
+                  "January",
+                  "February",
+                  "March",
+                  "April",
+                  "May",
+                  "June",
+                  "July",
+                  "August",
+                  "September",
+                  "October",
+                  "November",
+                  "December",
                 ].map((month) => (
                   <Picker.Item key={month} label={month} value={month} />
                 ))}
@@ -89,22 +145,18 @@ const Home = () => {
               style={styles.input}
               placeholder="Enter Year of Study"
               value={studentInfo.yearOfStudy}
-              onChangeText={(text) => handleInputChange("yearOfStudy", text)}
+              onChangeText={(text) =>
+                handleInputChange("yearOfStudy", text)
+              }
             />
           </View>
         </View>
 
-        {/* Navigation Buttons */}
         <View style={styles.buttonContainer}>
           <Button title="Previous" onPress={onPrevious} color="#FF6F61" />
-          <Button
-            title="Next"
-            onPress={() => router.push({ pathname: '/AcademicProgress', params: studentInfo })}
-            color="#4CAF50"
-          />
+          <Button title="Next" onPress={handleNext} color="#4CAF50" />
         </View>
 
-        {/* Logout Button */}
         <View style={{ marginTop: 20 }}>
           <Button title="Logout" onPress={onLogout} color="#d9534f" />
         </View>
@@ -126,9 +178,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
+    boxShadow: "0 0 5px rgba(0, 0, 0, 0.1)",
     elevation: 3,
   },
   title: {

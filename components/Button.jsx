@@ -3,6 +3,7 @@ import React from 'react';
 import { theme } from '../constants/theme';
 import { hp } from '../helpers/common';
 import Loading from './Loading';
+import { Platform } from 'react-native';  // Must be exactly this import
 
 const Button = ({
   buttonStyle,
@@ -12,14 +13,24 @@ const Button = ({
   loading = false,
   hasShadow = true,
 }) => {
-  const shadowStyle = {
-    shadowColor: theme.colors.dark,
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  };
-
+  // const shadowStyle = {
+  //   shadowColor: theme.colors.dark,
+  //   shadowOffset: { width: 0, height: 10 },
+  //   shadowOpacity: 0.2,
+  //   shadowRadius: 8,
+  //   elevation: 4,
+  // };
+  const shadowStyle = Platform.select({
+    ios: {
+      boxShadow: `0 10px 8px rgba(${parseInt(theme.colors.dark.slice(1, 3), 16)}, ${parseInt(theme.colors.dark.slice(3, 5), 16)}, ${parseInt(theme.colors.dark.slice(5, 7), 16)}, 0.2)`,
+    },
+    android: {
+      elevation: 4,
+    },
+    default: { // For web and other platforms
+      boxShadow: `0 10px 8px rgba(${parseInt(theme.colors.dark.slice(1, 3), 16)}, ${parseInt(theme.colors.dark.slice(3, 5), 16)}, ${parseInt(theme.colors.dark.slice(5, 7), 16)}, 0.2)`,
+    }
+  });
   if (loading) {
     return (
       <View style={[styles.button, buttonStyle, { backgroundColor: 'white' }]}>

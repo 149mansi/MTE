@@ -1,12 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, ScrollView, Button } from "react-native";
-import { Link } from "expo-router";
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { useRouter } from "expo-router";
+import { useAppData } from "../../contexts/AppDataContext"; // Import global state
 
 const HealthAndReading = () => {
+  const router = useRouter();
+  const { updateSectionData } = useAppData(); // Function to update global state
+
+  const [currentSection, setCurrentSection] = useState(0);
   const [data, setData] = useState({
     exercise: "",
     sleep: "",
-    eat: "",
+    diet: "",
     ladderBooks: "",
     otherBooks: "",
     ladderStatus: "",
@@ -20,85 +25,88 @@ const HealthAndReading = () => {
     }));
   };
 
+  const sections = [
+    {
+      title: "Exercise, Sleep, and Diet",
+      fields: [
+        { key: "exercise", placeholder: "Enter your exercise routine", value: data.exercise },
+        { key: "sleep", placeholder: "Enter your sleep duration", value: data.sleep },
+        { key: "diet", placeholder: "Describe your diet", value: data.diet },
+      ],
+    },
+    {
+      title: "Books Read and Ladder Progress",
+      fields: [
+        { key: "ladderBooks", placeholder: "List books from the ladder", value: data.ladderBooks },
+        { key: "otherBooks", placeholder: "List other books read", value: data.otherBooks },
+      ],
+    },
+    {
+      title: "Ladder Progress and Reviewed Books",
+      fields: [
+        { key: "ladderStatus", placeholder: "Enter your ladder progress status", value: data.ladderStatus },
+        { key: "reviewedBooks", placeholder: "Books you've reviewed", value: data.reviewedBooks },
+      ],
+    },
+  ];
+
+  const handleSaveAndNext = () => {
+    // Validate data before proceeding
+    const isAnyFieldFilled = Object.values(data).some((value) => value.trim() !== "");
+    if (!isAnyFieldFilled) {
+      Alert.alert("Validation Error", "Please fill in at least one field before proceeding.");
+      return;
+    }
+
+    // Update global state with health and reading data
+    updateSectionData("healthAndReading", data);
+
+    // Navigate to the next page
+    router.push("/FriendsAndEssayForm");
+  };
+
   return (
     <ScrollView style={styles.container}>
-      {/* Section 1: Exercise, Sleep, Eat */}
-      <Text style={styles.title}>
-        It's very important to exercise regularly and eat and sleep properly
-      </Text>
-      <Text style={styles.label}>Exercise:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Exercise"
-        value={data.exercise}
-        onChangeText={(text) => handleInputChange("exercise", text)}
-      />
-      <Text style={styles.label}>Sleep:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Sleep"
-        value={data.sleep}
-        onChangeText={(text) => handleInputChange("sleep", text)}
-      />
-      <Text style={styles.label}>Eat:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Eat"
-        value={data.eat}
-        onChangeText={(text) => handleInputChange("eat", text)}
-      />
+      <Text style={styles.title}>{sections[currentSection].title}</Text>
+      {sections[currentSection].fields.map((field) => (
+        <TextInput
+          key={field.key}
+          style={styles.input}
+          placeholder={field.placeholder}
+          value={field.value}
+          onChangeText={(text) => handleInputChange(field.key, text)}
+          multiline
+        />
+      ))}
 
-      {/* Section 2: Reading Books / Watching Videos */}
-      <Text style={styles.title}>Reading Books / Watching Videos</Text>
-      <Text style={styles.label}>Names of the ladder books/videos read:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Names of the ladder books/videos read"
-        value={data.ladderBooks}
-        onChangeText={(text) => handleInputChange("ladderBooks", text)}
-      />
-      <Text style={styles.label}>Names of the other books/videos:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Names of the other books/videos"
-        value={data.otherBooks}
-        onChangeText={(text) => handleInputChange("otherBooks", text)}
-      />
-      <Text style={styles.label}>Ladder status (books/videos read / to be read):</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Ladder status (books/videos read / to be read)"
-        value={data.ladderStatus}
-        onChangeText={(text) => handleInputChange("ladderStatus", text)}
-      />
-      <Text style={styles.label}>Books / Videos reviewed:</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Books / Videos reviewed"
-        value={data.reviewedBooks}
-        onChangeText={(text) => handleInputChange("reviewedBooks", text)}
-      />
-
-      {/* Navigation Buttons */}
       <View style={styles.buttonContainer}>
-        <Link
-          href={{
-            pathname: "/Co-Curricular section", // Navigate to Co-Curricular section
-            params: { section: "difficulties" }, // Navigate back to the difficulties section
-          }}
-          style={styles.link}
-        >
-          <Text style={styles.buttonText}>Previous</Text>
-        </Link>
-        <Link
-          href={{
-            pathname: "/FriendsAndEssayForm", // Navigate to FriendsAndEssayForm page
-            params: { studentInfo: data }, // Pass the current form data
-          }}
-          style={styles.link}
-        >
-          <Text style={styles.buttonText}>Next</Text>
-        </Link>
+        {currentSection > 0 ? (
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() => setCurrentSection((prev) => prev - 1)}
+          >
+            <Text style={styles.previousButton}>Previous</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() => router.push("/CoCurricularSection")}
+          >
+            <Text style={styles.previousButton}>Previous</Text>
+          </TouchableOpacity>
+        )}
+        {currentSection < sections.length - 1 ? (
+          <TouchableOpacity
+            style={styles.link}
+            onPress={() => setCurrentSection((prev) => prev + 1)}
+          >
+            <Text style={styles.nextButton}>Next</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity style={styles.link} onPress={handleSaveAndNext}>
+            <Text style={styles.nextButton}>Save and Next</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </ScrollView>
   );
@@ -118,12 +126,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: "#333",
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "500",
-    marginBottom: 5,
-    color: "#555",
-  },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
@@ -131,6 +133,8 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
     backgroundColor: "#fff",
+    minHeight: 50,
+    textAlignVertical: "top",
   },
   buttonContainer: {
     flexDirection: "row",
@@ -144,7 +148,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  buttonText: {
+  previousButton: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  nextButton: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",

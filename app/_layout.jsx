@@ -1,54 +1,65 @@
 // import { View, Text } from 'react-native'
-import React, { useEffect } from 'react'
-import { Stack, useRouter } from 'expo-router'
-import { AuthProvider, useAuth } from '../contexts/AuthContext'
-import { supabase } from '../lib/supabase'
-// import { useRoute } from '@react-navigation/native'
-import { getUserData } from '../services/userService'
+import React, { useEffect } from "react";
+import { Stack, useRouter } from "expo-router";
+import { AuthProvider, useAuth } from "../contexts/AuthContext";
+import { AppDataProvider } from "../contexts/AppDataContext";
+import { supabase } from "../lib/supabase";
+import { getUserData } from "../services/userService";
 
-const _layout=()=>{
-  return(
+const _layout = () => {
+  return (
     <AuthProvider>
-      <Mainlayout/>
+      <AppDataProvider>
+        <MainLayout />
+      </AppDataProvider>
     </AuthProvider>
-  )
-}
+  );
+};
 
-const Mainlayout = () => {
-  const {setAuth,setUserData}=useAuth();
+const MainLayout = () => {
+  const { setAuth, setUserData } = useAuth();
   const router = useRouter();
 
-  useEffect(()=>{
-    supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('session user:',session?.user?.id);
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        console.log("session user:", session?.user?.id);
 
-      if (session) {
-        // set auth
-        setAuth(session?.user);
-        updateUserData(session?.user);
-        // move to home screen
-        router.replace('/home');
-        
+        if (session) {
+          setAuth(session.user);
+          await updateUserData(session.user);
+          router.replace("/home");
+        } else {
+          setAuth(null);
+          router.replace("/welcome");
+        }
       }
-      else{
-        // set auth null
-        setAuth(null);
-        // move to welcome screen
-        router.replace('/welcome');
+    );
+
+    // Cleanup: Ensure proper unsubscription
+    return () => {
+      if (authListener && typeof authListener.unsubscribe === "function") {
+        authListener.unsubscribe();
       }
-    })
-  },[])
+    };
+  }, []);
+
   const updateUserData = async (user) => {
-    let res = await getUserData(user?.id);
-    if(res.error) setUserData(res.data);
-  }
+    try {
+      const res = await getUserData(user?.id);
+      if (!res.error) setUserData(res.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
+
   return (
     <Stack
-        screenOptions={{
-            headerShown:false
-        }}
+      screenOptions={{
+        headerShown: false,
+      }}
     />
-  )
-}
+  );
+};
 
-export default _layout
+export default _layout;

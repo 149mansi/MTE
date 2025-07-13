@@ -2521,8 +2521,255 @@
 // export default AcademicProgress; // now i chnage 13-07-2025 time 20:35
 
 
+// import React, { useState, useEffect, useRef, useCallback } from "react";
+// import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+// import { useAppData } from "../../contexts/AppDataContext";
+// import { useRouter } from "expo-router";
+
+// const AcademicProgress = () => {
+//   const router = useRouter();
+//   const { sectionData, updateSectionData } = useAppData();
+//   const [rows, setRows] = useState([]);
+//   const hasInitialized = useRef(false);
+
+//   useEffect(() => {
+//     if (!hasInitialized.current) {
+//       hasInitialized.current = true;
+//       const savedAcademicData = Array.isArray(sectionData?.academicProgress)
+//         ? sectionData.academicProgress
+//         : [];
+
+//       const newRows = [
+//         {
+//           id: 1,
+//           subject: "Subject / Activity",
+//           selfAssessment: "Self-assessment",
+//           justification: "Justification",
+//           isHeader: true,
+//         },
+//         ...savedAcademicData.map((item, index) => ({
+//           id: index + 2,
+//           subject: item.subject || "",
+//           selfAssessment: item.selfAssessment || "",
+//           justification: item.justification || "",
+//           isHeader: false,
+//         })),
+//       ];
+
+//       if (newRows.length === 1) {
+//         newRows.push({
+//           id: 2,
+//           subject: "",
+//           selfAssessment: "",
+//           justification: "",
+//           isHeader: false,
+//         });
+//       }
+
+//       setRows(newRows);
+//     }
+//   }, []);
+
+//   const handleSave = useCallback(() => {
+//     const currentRows = rows.filter(row => !row.isHeader);
+//     updateSectionData("academicProgress", currentRows);
+//   }, [rows, updateSectionData]);
+
+//   const handleAddRow = useCallback(() => {
+//     setRows(prev => [
+//       ...prev,
+//       {
+//         id: Date.now(),
+//         subject: "",
+//         selfAssessment: "",
+//         justification: "",
+//         isHeader: false,
+//       },
+//     ]);
+//   }, []);
+
+//   const handleDeleteRow = useCallback((id) => {
+//     setRows(prev => prev.filter(row => row.id !== id));
+//   }, []);
+
+//   const handleInputChange = useCallback((text, field, id) => {
+//     setRows(prev => prev.map(row =>
+//       row.id === id ? { ...row, [field]: text } : row
+//     ));
+//   }, []);
+
+//   const renderRow = useCallback(({ item }) => (
+//     <View style={styles.row}>
+//       <TextInput
+//         style={[styles.input, item.isHeader && styles.headerCell]}
+//         editable={!item.isHeader}
+//         value={item.subject}
+//         onChangeText={(text) => handleInputChange(text, "subject", item.id)}
+//       />
+//       <TextInput
+//         style={[styles.input, item.isHeader && styles.headerCell]}
+//         editable={!item.isHeader}
+//         value={item.selfAssessment}
+//         onChangeText={(text) => handleInputChange(text, "selfAssessment", item.id)}
+//       />
+//       <TextInput
+//         style={[styles.input, item.isHeader && styles.headerCell]}
+//         editable={!item.isHeader}
+//         value={item.justification}
+//         onChangeText={(text) => handleInputChange(text, "justification", item.id)}
+//       />
+//       {!item.isHeader && (
+//         <TouchableOpacity onPress={() => handleDeleteRow(item.id)}>
+//           <Text style={styles.deleteButtonText}>×</Text>
+//         </TouchableOpacity>
+//       )}
+//     </View>
+//   ), [handleInputChange, handleDeleteRow]);
+
+//   // ✅ FIXED: Always go to /Home
+//   const handlePrevious = () => router.push("/home");
+
+//   // ✅ CLEAN PATH: Use correct name (change if needed)
+//   const handleNext = () => router.push("/CoCurricularSection");
+
+//   return (
+//     <View style={styles.container}>
+//       <View style={styles.sectionHeader}>
+//         <Text style={styles.sectionHeaderText}>Academic Progress</Text>
+//       </View>
+
+//       <FlatList
+//         data={rows}
+//         renderItem={renderRow}
+//         keyExtractor={item => item.id.toString()}
+//         contentContainerStyle={styles.listContent}
+//       />
+
+//       <TouchableOpacity style={styles.addButton} onPress={handleAddRow}>
+//         <Text style={styles.buttonText}>+ Add Row</Text>
+//       </TouchableOpacity>
+
+//       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+//         <Text style={styles.buttonText}>Save Changes</Text>
+//       </TouchableOpacity>
+
+//       <View style={styles.navButtons}>
+//         <TouchableOpacity 
+//           style={[styles.navButton, styles.prevButton]}
+//           onPress={handlePrevious}
+//         >
+//           <Text style={styles.navButtonText}>Previous</Text>
+//         </TouchableOpacity>
+//         <TouchableOpacity
+//           style={[styles.navButton, styles.nextButton]}
+//           onPress={handleNext}
+//         >
+//           <Text style={styles.navButtonText}>Next</Text>
+//         </TouchableOpacity>
+//       </View>
+//     </View>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: { 
+//     flex: 1, 
+//     padding: 20,
+//     backgroundColor: '#f8f9fa'
+//   },
+//   sectionHeader: { 
+//     padding: 15, 
+//     backgroundColor: '#e9ecef',
+//     borderRadius: 5,
+//     marginBottom: 10
+//   },
+//   sectionHeaderText: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     textAlign: 'center'
+//   },
+//   row: { 
+//     flexDirection: 'row', 
+//     marginBottom: 8,
+//     alignItems: 'center'
+//   },
+//   input: { 
+//     flex: 1, 
+//     borderWidth: 1, 
+//     borderColor: '#ced4da',
+//     borderRadius: 4,
+//     padding: 10,
+//     marginHorizontal: 4,
+//     backgroundColor: '#fff'
+//   },
+//   headerCell: { 
+//     backgroundColor: '#e9ecef', 
+//     fontWeight: 'bold' 
+//   },
+//   deleteButtonText: { 
+//     color: 'red', 
+//     fontSize: 20,
+//     paddingHorizontal: 10
+//   },
+//   addButton: { 
+//     backgroundColor: '#28a745',
+//     padding: 12,
+//     borderRadius: 5,
+//     alignItems: 'center',
+//     marginVertical: 8
+//   },
+//   saveButton: {
+//     backgroundColor: '#ffc107',
+//     padding: 12,
+//     borderRadius: 5,
+//     alignItems: 'center',
+//     marginBottom: 8
+//   },
+//   navButtons: { 
+//     flexDirection: 'row', 
+//     justifyContent: 'space-between',
+//     marginTop: 10
+//   },
+//   navButton: {
+//     padding: 12,
+//     borderRadius: 5,
+//     flex: 1,
+//     marginHorizontal: 5,
+//     alignItems: 'center'
+//   },
+//   prevButton: { 
+//     backgroundColor: '#6c757d' 
+//   },
+//   nextButton: { 
+//     backgroundColor: '#007bff' 
+//   },
+//   navButtonText: { 
+//     color: '#fff',
+//     fontWeight: 'bold'
+//   },
+//   buttonText: {
+//     color: '#fff',
+//     fontWeight: 'bold'
+//   },
+//   listContent: {
+//     paddingBottom: 15
+//   }
+// });
+
+// export default AcademicProgress;  now i am used 14-07-2025 time 12:00 night
+
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { useAppData } from "../../contexts/AppDataContext";
 import { useRouter } from "expo-router";
 
@@ -2626,56 +2873,86 @@ const AcademicProgress = () => {
     </View>
   ), [handleInputChange, handleDeleteRow]);
 
-  // ✅ FIXED: Always go to /Home
   const handlePrevious = () => router.push("/home");
-
-  // ✅ CLEAN PATH: Use correct name (change if needed)
   const handleNext = () => router.push("/CoCurricularSection");
 
   return (
-    <View style={styles.container}>
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionHeaderText}>Academic Progress</Text>
-      </View>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={100}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionHeaderText}>Academic Progress</Text>
+          </View>
 
-      <FlatList
-        data={rows}
-        renderItem={renderRow}
-        keyExtractor={item => item.id.toString()}
-        contentContainerStyle={styles.listContent}
-      />
+          {/* FlatList replaced with direct mapping for better scroll nesting */}
+          {rows.map(item => (
+            <View key={item.id.toString()} style={styles.row}>
+              <TextInput
+                style={[styles.input, item.isHeader && styles.headerCell]}
+                editable={!item.isHeader}
+                value={item.subject}
+                onChangeText={(text) => handleInputChange(text, "subject", item.id)}
+              />
+              <TextInput
+                style={[styles.input, item.isHeader && styles.headerCell]}
+                editable={!item.isHeader}
+                value={item.selfAssessment}
+                onChangeText={(text) => handleInputChange(text, "selfAssessment", item.id)}
+              />
+              <TextInput
+                style={[styles.input, item.isHeader && styles.headerCell]}
+                editable={!item.isHeader}
+                value={item.justification}
+                onChangeText={(text) => handleInputChange(text, "justification", item.id)}
+              />
+              {!item.isHeader && (
+                <TouchableOpacity onPress={() => handleDeleteRow(item.id)}>
+                  <Text style={styles.deleteButtonText}>×</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          ))}
 
-      <TouchableOpacity style={styles.addButton} onPress={handleAddRow}>
-        <Text style={styles.buttonText}>+ Add Row</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.addButton} onPress={handleAddRow}>
+            <Text style={styles.buttonText}>+ Add Row</Text>
+          </TouchableOpacity>
 
-      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.buttonText}>Save Changes</Text>
-      </TouchableOpacity>
+          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+            <Text style={styles.buttonText}>Save Changes</Text>
+          </TouchableOpacity>
 
-      <View style={styles.navButtons}>
-        <TouchableOpacity 
-          style={[styles.navButton, styles.prevButton]}
-          onPress={handlePrevious}
-        >
-          <Text style={styles.navButtonText}>Previous</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.navButton, styles.nextButton]}
-          onPress={handleNext}
-        >
-          <Text style={styles.navButtonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+          <View style={styles.navButtons}>
+            <TouchableOpacity 
+              style={[styles.navButton, styles.prevButton]}
+              onPress={handlePrevious}
+            >
+              <Text style={styles.navButtonText}>Previous</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.navButton, styles.nextButton]}
+              onPress={handleNext}
+            >
+              <Text style={styles.navButtonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
+  scrollContainer: {
+    flexGrow: 1,
+    backgroundColor: '#f8f9fa',
     padding: 20,
-    backgroundColor: '#f8f9fa'
+  },
+  container: {
+    flex: 1,
   },
   sectionHeader: { 
     padding: 15, 
@@ -2750,13 +3027,11 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontWeight: 'bold'
-  },
-  listContent: {
-    paddingBottom: 15
   }
 });
 
 export default AcademicProgress;
+
 
 
 

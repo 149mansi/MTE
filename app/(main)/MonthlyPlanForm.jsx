@@ -29,7 +29,7 @@
 //     try {
 //       return studentInfo
 //         ? typeof studentInfo === "string"
-//           ? JSON.parse(studentInfo)
+//           ? .parse(studentInfo)
 //           : studentInfo
 //         : {};
 //     } catch (error) {
@@ -76,7 +76,7 @@
 //     try {
 //       const completeData = { ...combinedData, monthlyPlan: formData };
 //       const { fileUri } = await generateExcelFile(completeData);
-      
+
 //       if (Platform.OS === 'web') {
 //         const link = document.createElement('a');
 //         link.href = fileUri;
@@ -134,16 +134,16 @@
 //           <Text style={styles.previousButton}>Previous</Text>
 //         </Link>
 
-//         <Button 
-//           title="Download Report" 
-//           onPress={handleDownload} 
+//         <Button
+//           title="Download Report"
+//           onPress={handleDownload}
 //           color="#2196F3"
 //         />
 
-//         <Button 
-//           title="Submit" 
-//           onPress={handleSubmit} 
-//           color="#4CAF50" 
+//         <Button
+//           title="Submit"
+//           onPress={handleSubmit}
+//           color="#4CAF50"
 //         />
 //       </View>
 //     </ScrollView>
@@ -196,100 +196,961 @@
 
 // export default MonthlyPlanForm;
 
-import React, { useState } from "react";
+// import React, { useState } from "react";
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   StyleSheet,
+//   Button,
+//   ScrollView,
+//   Alert,
+//   TouchableOpacity,
+//   Platform,
+// } from "react-native";
+// import { useRouter } from "expo-router";
+// import * as Sharing from "expo-sharing";
+// import * as FileSystem from "expo-file-system";
+// import { generateExcelFile } from "../../utils/generateExcelFile";
+// import { useAppData } from "../../contexts/AppDataContext"; // Add this import
+
+// const MonthlyPlanForm = () => {
+//   const router = useRouter();
+//   const { sectionData } = useAppData(); // Get all your collected data
+
+//   // State for form data
+//   const [formData, setFormData] = useState({
+//     actionPlan: "",
+//     mentorComments: "",
+//     counselingPlan: "",
+//   });
+
+//   // Combine all data from different sections
+//   const combinedData = {
+//     ...sectionData?.home,
+//     academicProgress: sectionData?.academicProgress,
+//     coCurricular: sectionData?.coCurricular,
+//     healthAndReading: sectionData?.healthAndReading,
+//     friendsAndEssay: sectionData?.friendsAndEssay,
+//     monthlyPlan: formData,
+//   };
+
+//   // Handle form field changes
+//   const handleInputChange = (key, value) => {
+//     setFormData((prev) => ({ ...prev, [key]: value }));
+//   };
+
+//   // Submit form and generate/share the file
+//   const handleSubmit = async () => {
+//     try {
+//       const { fileUri } = await generateExcelFile(combinedData);
+
+//       if (Platform.OS === "web") {
+//         Alert.alert("Success", "Report downloaded automatically!");
+//       } else if (await Sharing.isAvailableAsync()) {
+//         await Sharing.shareAsync(fileUri);
+//         Alert.alert("Success", "Report shared successfully!");
+//       } else {
+//         Alert.alert("Success", "Report saved to your device!");
+//       }
+
+//       router.replace("/Home");
+//     } catch (error) {
+//       console.error("Submission error:", error);
+//       Alert.alert("Error", "Failed to generate the report.");
+//     }
+//   };
+
+//   const handleDownload = async () => {
+//     try {
+//       const { fileUri, fileName } = await generateExcelFile(combinedData);
+
+//       if (Platform.OS !== "web") {
+//         const downloadPath = FileSystem.documentDirectory + fileName;
+//         await FileSystem.copyAsync({ from: fileUri, to: downloadPath });
+//         Alert.alert("Download Success", `File saved to ${downloadPath}`);
+//       }
+//     } catch (error) {
+//       console.error("Download error:", error);
+//       Alert.alert("Error", "Failed to download the report.");
+//     }
+//   };
+
+//   return (
+//     <ScrollView style={styles.container}>
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Action Plan for the Coming Month</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter your action plan here"
+//           value={formData.actionPlan}
+//           onChangeText={(text) => handleInputChange("actionPlan", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Comments by the Mentor</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter mentor's comments here"
+//           value={formData.mentorComments}
+//           onChangeText={(text) => handleInputChange("mentorComments", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Action Plan Based on Counseling</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter counseling-based plan here"
+//           value={formData.counselingPlan}
+//           onChangeText={(text) => handleInputChange("counselingPlan", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.buttonContainer}>
+//         <TouchableOpacity
+//           onPress={() =>
+//             router.push({
+//               pathname: "/FriendsAndEssayForm",
+//               params: { studentInfo: JSON.stringify(combinedData) },
+//             })
+//           }
+//           style={[styles.link, styles.previousButton]}
+//         >
+//           <Text style={styles.previousButtonText}>Previous</Text>
+//         </TouchableOpacity>
+
+//         <Button title="Download Report" onPress={handleDownload} color="#2196F3" />
+//         <Button title="Submit" onPress={handleSubmit} color="#4CAF50" />
+//       </View>
+//     </ScrollView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 20,
+//     backgroundColor: "#f8f9fa",
+//   },
+//   section: {
+//     marginBottom: 20,
+//   },
+//   sectionTitle: {
+//     fontSize: 16,
+//     fontWeight: "bold",
+//     marginBottom: 10,
+//     color: "#333",
+//   },
+//   input: {
+//     borderWidth: 1,
+//     borderColor: "#ccc",
+//     borderRadius: 5,
+//     padding: 10,
+//     minHeight: 50,
+//     backgroundColor: "#fff",
+//     textAlignVertical: "top",
+//   },
+//   buttonContainer: {
+//     marginTop: 20,
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     gap: 10,
+//   },
+//   link: {
+//     padding: 10,
+//     backgroundColor: "#FF6F61",
+//     borderRadius: 5,
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   previousButton: {
+//     backgroundColor: "#FF6F61",
+//   },
+//   previousButtonText: {
+//     color: "#fff",
+//     fontSize: 16,
+//     fontWeight: "bold",
+//   },
+// });
+
+// export default MonthlyPlanForm;
+
+// import React, { useState, useEffect } from "react";
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   StyleSheet,
+//   ScrollView,
+//   Alert,
+//   TouchableOpacity,
+//   Platform,
+//   ActivityIndicator
+// } from "react-native";
+// import { useRouter } from "expo-router";
+// import * as Sharing from "expo-sharing";
+// import * as FileSystem from "expo-file-system";
+// import { generateExcelFile } from "../../utils/generateExcelFile";
+// import { useAppData } from "../../contexts/AppDataContext";
+
+// const MonthlyPlanForm = () => {
+//   const router = useRouter();
+//   const { sectionData } = useAppData();
+//   const [formData, setFormData] = useState({
+//     actionPlan: "",
+//     mentorComments: "",
+//     counselingPlan: "",
+//   });
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   // Combine all data from different sections
+//   // Replace getCombinedData() in MonthlyPlanForm.js with:
+
+// const getCombinedData = () => {
+//   return {
+//     // Student Info (from Home.jsx)
+//     thinkingExercise: sectionData?.home?.thinkingExercise,
+//     month: sectionData?.home?.month,
+//     college: sectionData?.home?.college,
+//     yearOfStudy: sectionData?.home?.yearOfStudy,
+
+//     // Academic Progress (array structure)
+//     academicProgress: sectionData?.academicProgress || [],
+
+//     // Co-Curricular (object with all fields)
+//     coCurricular: {
+//       realLifeProject: sectionData?.coCurricular?.realLifeProject,
+//       extraEnglish: sectionData?.coCurricular?.extraEnglish,
+//       CoandExtraCurricularProgressPlan: sectionData?.coCurricular?.CoandExtraCurricularProgressPlan,
+//       examResults: sectionData?.coCurricular?.examResults,
+//       financialRequirements: sectionData?.coCurricular?.financialRequirements,
+//       difficulties: sectionData?.coCurricular?.difficulties,
+//     },
+
+//     // Health & Reading (all fields)
+//     healthAndReading: {
+//       exercise: sectionData?.healthAndReading?.exercise,
+//       sleep: sectionData?.healthAndReading?.sleep,
+//       diet: sectionData?.healthAndReading?.diet,
+//       ladderBooks: sectionData?.healthAndReading?.ladderBooks,
+//       otherBooks: sectionData?.healthAndReading?.otherBooks,
+//       ladderStatus: sectionData?.healthAndReading?.ladderStatus,
+//       reviewedBooks: sectionData?.healthAndReading?.reviewedBooks,
+//     },
+
+//     // Friends & Essay (all fields)
+//     friendsAndEssay: {
+//       friends: sectionData?.friendsAndEssay?.friends,
+//       learnings: sectionData?.friendsAndEssay?.learnings,
+//       essay: sectionData?.friendsAndEssay?.essay,
+//     },
+
+//     // Monthly Plan (current form)
+//     monthlyPlan: formData,
+//   };
+// };
+//   // Validate data (no checks required now)
+//   const validateData = (data) => {
+//     return true;
+//   };
+
+//   // Handle form field changes
+//   const handleInputChange = (key, value) => {
+//     setFormData((prev) => ({ ...prev, [key]: value }));
+//   };
+
+//   // Generate and share the file
+//   const handleSubmit = async () => {
+//     const combinedData = getCombinedData();
+//     if (!validateData(combinedData)) return;
+
+//     setIsLoading(true);
+//     try {
+//       const { fileUri } = await generateExcelFile(combinedData);
+
+//       if (Platform.OS === "web") {
+//         Alert.alert("Success", "Report downloaded automatically!");
+//       } else if (await Sharing.isAvailableAsync()) {
+//         await Sharing.shareAsync(fileUri);
+//       } else {
+//         Alert.alert("Success", "Report saved to your device!");
+//       }
+
+//       router.replace("/Home");
+//     } catch (error) {
+//       console.error("Submission error:", error);
+//       Alert.alert(
+//         "Error",
+//         `Failed to generate report: ${error.message || "Unknown error"}`
+//       );
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   const handleDownload = async () => {
+//     const combinedData = getCombinedData();
+
+//     setIsLoading(true);
+//     try {
+//       const { fileUri, fileName } = await generateExcelFile(combinedData);
+
+//       if (Platform.OS !== "web") {
+//         const downloadPath = FileSystem.documentDirectory + fileName;
+//         await FileSystem.copyAsync({ from: fileUri, to: downloadPath });
+//         Alert.alert("Download Success", `File saved to ${downloadPath}`);
+//       }
+//     } catch (error) {
+//       console.error("Download error:", error);
+//       Alert.alert("Error", "Failed to download the report.");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   // Check data when component mounts
+//   useEffect(() => {
+//   const combined = getCombinedData();
+//   console.log("Data being sent to Excel:", JSON.stringify(combined, null, 2));
+// }, [sectionData, formData]);
+
+//   if (isLoading) {
+//     return (
+//       <View style={[styles.container, styles.loadingContainer]}>
+//         <ActivityIndicator size="large" color="#4CAF50" />
+//         <Text style={styles.loadingText}>Generating Report...</Text>
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <ScrollView style={styles.container}>
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Action Plan for the Coming Month</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter your action plan here"
+//           value={formData.actionPlan}
+//           onChangeText={(text) => handleInputChange("actionPlan", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Comments by the Mentor</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter mentor's comments here"
+//           value={formData.mentorComments}
+//           onChangeText={(text) => handleInputChange("mentorComments", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Action Plan Based on Counseling</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter counseling-based plan here"
+//           value={formData.counselingPlan}
+//           onChangeText={(text) => handleInputChange("counselingPlan", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.buttonContainer}>
+//         <TouchableOpacity
+//           onPress={() => router.push("/FriendsAndEssayForm")}
+//           style={[styles.button, styles.previousButton]}
+//         >
+//           <Text style={styles.buttonText}>Previous</Text>
+//         </TouchableOpacity>
+
+//         <TouchableOpacity
+//           onPress={handleDownload}
+//           style={[styles.button, styles.downloadButton]}
+//           disabled={isLoading}
+//         >
+//           <Text style={styles.buttonText}>
+//             {isLoading ? "Processing..." : "Download Report"}
+//           </Text>
+//         </TouchableOpacity>
+
+//         <TouchableOpacity
+//           onPress={handleSubmit}
+//           style={[styles.button, styles.submitButton]}
+//           disabled={isLoading}
+//         >
+//           <Text style={styles.buttonText}>
+//             {isLoading ? "Processing..." : "Submit"}
+//           </Text>
+//         </TouchableOpacity>
+//       </View>
+//     </ScrollView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 20,
+//     backgroundColor: "#f8f9fa",
+//   },
+//   loadingContainer: {
+//     justifyContent: "center",
+//     alignItems: "center",
+//     gap: 20,
+//   },
+//   loadingText: {
+//     fontSize: 18,
+//     color: "#333",
+//   },
+//   section: {
+//     marginBottom: 20,
+//   },
+//   sectionTitle: {
+//     fontSize: 16,
+//     fontWeight: "bold",
+//     marginBottom: 10,
+//     color: "#333",
+//   },
+//   input: {
+//     borderWidth: 1,
+//     borderColor: "#ccc",
+//     borderRadius: 5,
+//     padding: 10,
+//     minHeight: 50,
+//     backgroundColor: "#fff",
+//     textAlignVertical: "top",
+//   },
+//   buttonContainer: {
+//     marginTop: 20,
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     gap: 10,
+//   },
+//   button: {
+//     flex: 1,
+//     padding: 12,
+//     borderRadius: 5,
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   buttonText: {
+//     color: "#fff",
+//     fontSize: 16,
+//     fontWeight: "bold",
+//   },
+//   previousButton: {
+//     backgroundColor: "#FF6F61",
+//   },
+//   downloadButton: {
+//     backgroundColor: "#2196F3",
+//   },
+//   submitButton: {
+//     backgroundColor: "#4CAF50",
+//   },
+// });
+
+// export default MonthlyPlanForm;
+
+
+
+// import React, { useState, useEffect } from "react";
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   StyleSheet,
+//   ScrollView,
+//   Alert,
+//   TouchableOpacity,
+//   Platform,
+//   ActivityIndicator,
+// } from "react-native";
+// import { useRouter } from "expo-router";
+// import * as Sharing from "expo-sharing";
+// import * as FileSystem from "expo-file-system";
+// import { generateExcelFile } from "../../utils/generateExcelFile";
+// import { useAppData } from "../../contexts/AppDataContext";
+
+// const MonthlyPlanForm = () => {
+//   const router = useRouter();
+//   const { sectionData } = useAppData();
+//   const [formData, setFormData] = useState({
+//     actionPlan: "",
+//     mentorComments: "",
+//     counselingPlan: "",
+//   });
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   const getCombinedData = () => {
+//     const academicProgress = Array(8)
+//       .fill()
+//       .map((_, index) => {
+//         const item = sectionData?.academicProgress?.[index] || {};
+//         return {
+//           subject: item.subject || `Subject ${index + 1}`,
+//           selfAssessment: item.selfAssessment || "",
+//           justification: item.justification || "",
+//         };
+//       });
+//     return {
+//       thinkingExercise: sectionData?.home?.thinkingExercise,
+//       month: sectionData?.home?.month,
+//       college: sectionData?.home?.college,
+//       yearOfStudy: sectionData?.home?.yearOfStudy,
+//       academicProgress: sectionData?.academicProgress || [],
+//       coCurricular: {
+//         realLifeProject: sectionData?.coCurricular?.realLifeProject,
+//         extraEnglish: sectionData?.coCurricular?.extraEnglish,
+//         CoandExtraCurricularProgressPlan:
+//           sectionData?.coCurricular?.CoandExtraCurricularProgressPlan,
+//         examResults: sectionData?.coCurricular?.examResults,
+//         financialRequirements: sectionData?.coCurricular?.financialRequirements,
+//         difficulties: sectionData?.coCurricular?.difficulties,
+//       },
+//       healthAndReading: {
+//         exercise: sectionData?.healthAndReading?.exercise,
+//         sleep: sectionData?.healthAndReading?.sleep,
+//         diet: sectionData?.healthAndReading?.diet,
+//         ladderBooks: sectionData?.healthAndReading?.ladderBooks,
+//         otherBooks: sectionData?.healthAndReading?.otherBooks,
+//         ladderStatus: sectionData?.healthAndReading?.ladderStatus,
+//         reviewedBooks: sectionData?.healthAndReading?.reviewedBooks,
+//       },
+//       friendsAndEssay: {
+//         friends: sectionData?.friendsAndEssay?.friends,
+//         learnings: sectionData?.friendsAndEssay?.learnings,
+//         essay: sectionData?.friendsAndEssay?.essay,
+//       },
+//       monthlyPlan: formData,
+//     };
+//   };
+
+//   const validateData = (data) => {
+//     return true;
+//   };
+
+//   const handleInputChange = (key, value) => {
+//     setFormData((prev) => ({ ...prev, [key]: value }));
+//   };
+
+//   const handleSubmit = async () => {
+//     const combinedData = getCombinedData();
+//     if (!validateData(combinedData)) return;
+
+//     setIsLoading(true);
+//     try {
+//       const { fileUri } = await generateExcelFile(combinedData);
+
+//       if (Platform.OS === "web") {
+//         Alert.alert("Success", "Report downloaded automatically!");
+//       } else if (await Sharing.isAvailableAsync()) {
+//         await Sharing.shareAsync(fileUri);
+//       } else {
+//         Alert.alert("Success", "Report saved to your device!");
+//       }
+
+//       router.replace("/Home");
+//     } catch (error) {
+//       console.error("Submission error:", error);
+//       Alert.alert(
+//         "Error",
+//         `Failed to generate report: ${error.message || "Unknown error"}`
+//       );
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   const handleDownload = async () => {
+//     const combinedData = getCombinedData();
+//     setIsLoading(true);
+
+//     try {
+//       const { fileUri, fileName } = await generateExcelFile(combinedData);
+
+//       if (Platform.OS !== "web") {
+//         if (Platform.OS === "android") {
+//           // Request permissions for Android Downloads folder
+//           const permissions =
+//             await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+
+//           if (permissions.granted) {
+//             const downloadUri = permissions.directoryUri;
+//             const newFileUri = `${downloadUri}/${fileName}`;
+
+//             // Read the file content
+//             const fileContent = await FileSystem.readAsStringAsync(fileUri, {
+//               encoding: FileSystem.EncodingType.Base64,
+//             });
+
+//             // Create the file in Downloads
+//             await FileSystem.StorageAccessFramework.createFileAsync(
+//               downloadUri,
+//               fileName,
+//               "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+//             ).then(async (newUri) => {
+//               await FileSystem.writeAsStringAsync(newUri, fileContent, {
+//                 encoding: FileSystem.EncodingType.Base64,
+//               });
+//             });
+
+//             Alert.alert(
+//               "Download Complete",
+//               `File saved to Downloads folder as ${fileName}`,
+//               [
+//                 {
+//                   text: "Open File",
+//                   onPress: () => Sharing.shareAsync(newFileUri),
+//                 },
+//                 {
+//                   text: "OK",
+//                   style: "cancel",
+//                 },
+//               ]
+//             );
+//           }
+//         } else {
+//           // For iOS, use document directory
+//           const downloadPath = FileSystem.documentDirectory + fileName;
+//           await FileSystem.copyAsync({
+//             from: fileUri,
+//             to: downloadPath,
+//           });
+//           Alert.alert("Download Complete", `File saved to: ${fileName}`, [
+//             {
+//               text: "Open File",
+//               onPress: () => Sharing.shareAsync(downloadPath),
+//             },
+//             {
+//               text: "OK",
+//               style: "cancel",
+//             },
+//           ]);
+//         }
+//       }
+//     } catch (error) {
+//       console.error("Download error:", error);
+//       Alert.alert("Error", `Failed to download: ${error.message}`, [
+//         {
+//           text: "OK",
+//           style: "cancel",
+//         },
+//       ]);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   useEffect(() => {
+//     const combined = getCombinedData();
+//     console.log("Data being sent to Excel:", JSON.stringify(combined, null, 2));
+//   }, [sectionData, formData]);
+
+//   if (isLoading) {
+//     return (
+//       <View style={[styles.container, styles.loadingContainer]}>
+//         <ActivityIndicator size="large" color="#4CAF50" />
+//         <Text style={styles.loadingText}>Generating Report...</Text>
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <ScrollView style={styles.container}>
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>
+//           Action Plan for the Coming Month
+//         </Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter your action plan here"
+//           value={formData.actionPlan}
+//           onChangeText={(text) => handleInputChange("actionPlan", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Comments by the Mentor</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter mentor's comments here"
+//           value={formData.mentorComments}
+//           onChangeText={(text) => handleInputChange("mentorComments", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Action Plan Based on Counseling</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter counseling-based plan here"
+//           value={formData.counselingPlan}
+//           onChangeText={(text) => handleInputChange("counselingPlan", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.buttonContainer}>
+//         <TouchableOpacity
+//           onPress={() => router.push("/FriendsAndEssayForm")}
+//           style={[styles.button, styles.previousButton]}
+//         >
+//           <Text style={styles.buttonText}>Previous</Text>
+//         </TouchableOpacity>
+
+//         <TouchableOpacity
+//           onPress={handleDownload}
+//           style={[styles.button, styles.downloadButton]}
+//           disabled={isLoading}
+//         >
+//           <Text style={styles.buttonText}>
+//             {isLoading ? "Processing..." : "Download Report"}
+//           </Text>
+//         </TouchableOpacity>
+
+//         <TouchableOpacity
+//           onPress={handleSubmit}
+//           style={[styles.button, styles.submitButton]}
+//           disabled={isLoading}
+//         >
+//           <Text style={styles.buttonText}>
+//             {isLoading ? "Processing..." : "Submit"}
+//           </Text>
+//         </TouchableOpacity>
+//       </View>
+//     </ScrollView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 20,
+//     backgroundColor: "#f8f9fa",
+//   },
+//   loadingContainer: {
+//     justifyContent: "center",
+//     alignItems: "center",
+//     gap: 20,
+//   },
+//   loadingText: {
+//     fontSize: 18,
+//     color: "#333",
+//   },
+//   section: {
+//     marginBottom: 20,
+//   },
+//   sectionTitle: {
+//     fontSize: 16,
+//     fontWeight: "bold",
+//     marginBottom: 10,
+//     color: "#333",
+//   },
+//   input: {
+//     borderWidth: 1,
+//     borderColor: "#ccc",
+//     borderRadius: 5,
+//     padding: 10,
+//     minHeight: 50,
+//     backgroundColor: "#fff",
+//     textAlignVertical: "top",
+//   },
+//   buttonContainer: {
+//     marginTop: 20,
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     gap: 10,
+//   },
+//   button: {
+//     flex: 1,
+//     padding: 12,
+//     borderRadius: 5,
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   buttonText: {
+//     color: "#fff",
+//     fontSize: 16,
+//     fontWeight: "bold",
+//   },
+//   previousButton: {
+//     backgroundColor: "#FF6F61",
+//   },
+//   downloadButton: {
+//     backgroundColor: "#2196F3",
+//   },
+//   submitButton: {
+//     backgroundColor: "#4CAF50",
+//   },
+// });
+
+// export default MonthlyPlanForm;
+
+
+
+
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
-  Button,
   ScrollView,
   Alert,
+  TouchableOpacity,
   Platform,
+  ActivityIndicator,
 } from "react-native";
-import { Link, useLocalSearchParams, useRouter } from "expo-router";
-import { generateExcelFile } from "../../utils/generateExcelFile";
+import { useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system";
+import { generateExcelFile } from "../../utils/generateExcelFile";
+import { useAppData } from "../../contexts/AppDataContext";
 
 const MonthlyPlanForm = () => {
   const router = useRouter();
-  const { studentInfo } = useLocalSearchParams();
-
+  const { sectionData, updateSectionData } = useAppData(); // Fix: Ensure updates are saved
   const [formData, setFormData] = useState({
-    actionPlan: "",
-    mentorComments: "",
-    counselingPlan: "",
+    actionPlan: sectionData?.monthlyPlan?.actionPlan || "",
+    mentorComments: sectionData?.monthlyPlan?.mentorComments || "",
+    counselingPlan: sectionData?.monthlyPlan?.counselingPlan || "",
   });
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Parse studentInfo safely
-  const combinedData = (() => {
-    try {
-      return studentInfo
-        ? typeof studentInfo === "string"
-          ? JSON.parse(studentInfo)
-          : studentInfo
-        : {};
-    } catch (error) {
-      console.error("Failed to parse studentInfo:", error);
-      return {};
+  // Save form data to context whenever it changes
+  useEffect(() => {
+    updateSectionData("monthlyPlan", formData);
+  }, [formData]);
+
+  const getCombinedData = () => {
+    const academicProgress = Array(8)
+      .fill()
+      .map((_, index) => {
+        const item = sectionData?.academicProgress?.[index] || {};
+        return {
+          subject: item.subject || `Subject ${index + 1}`,
+          selfAssessment: item.selfAssessment || "",
+          justification: item.justification || "",
+        };
+      });
+    return {
+      thinkingExercise: sectionData?.home?.thinkingExercise,
+      month: sectionData?.home?.month,
+      college: sectionData?.home?.college,
+      yearOfStudy: sectionData?.home?.yearOfStudy,
+      academicProgress: academicProgress,
+      coCurricular: sectionData?.coCurricular || {},
+      healthAndReading: sectionData?.healthAndReading || {},
+      friendsAndEssay: sectionData?.friendsAndEssay || {},
+      monthlyPlan: formData,
+    };
+  };
+
+  const validateData = (data) => {
+    if (!data.monthlyPlan.actionPlan.trim()) {
+      Alert.alert("Validation Error", "Action Plan cannot be empty.");
+      return false;
     }
-  })();
+    return true;
+  };
 
   const handleInputChange = (key, value) => {
-    setFormData((prevState) => ({
-      ...prevState,
-      [key]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
   const handleSubmit = async () => {
-    try {
-      const completeData = { ...combinedData, monthlyPlan: formData };
-      const { fileUri } = await generateExcelFile(completeData);
+    const combinedData = getCombinedData();
+    if (!validateData(combinedData)) return;
 
-      if (Platform.OS !== "web" && await Sharing.isAvailableAsync()) {
+    setIsLoading(true);
+    try {
+      const { fileUri } = await generateExcelFile(combinedData);
+
+      if (Platform.OS === "web") {
+        Alert.alert("Success", "Report downloaded automatically!");
+      } else if (await Sharing.isAvailableAsync()) {
         await Sharing.shareAsync(fileUri);
-        Alert.alert("Success", "Report shared successfully!");
       } else {
-        Alert.alert("Success", "Report generated successfully!");
+        Alert.alert("Success", "Report saved to your device!");
       }
 
       router.replace("/Home");
-    } catch (err) {
-      console.error("Error:", err);
-      Alert.alert("Error", "Failed to generate and share the report.");
+    } catch (error) {
+      console.error("Submission error:", error);
+      Alert.alert(
+        "Error",
+        `Failed to generate report: ${error.message || "Unknown error"}`
+      );
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleDownload = async () => {
+    const combinedData = getCombinedData();
+    setIsLoading(true);
+
     try {
-      const completeData = { ...combinedData, monthlyPlan: formData };
-      const { fileUri, fileName } = await generateExcelFile(completeData);
+      const { fileUri, fileName } = await generateExcelFile(combinedData);
 
-      if (Platform.OS === "web") {
-        // Web: Create Blob and trigger download
-        const response = await fetch(fileUri);
-        if (!response.ok) throw new Error("Failed to fetch file content");
+      if (Platform.OS === "android") {
+        const permissions =
+          await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+        if (permissions.granted) {
+          const downloadUri = permissions.directoryUri;
+          const fileContent = await FileSystem.readAsStringAsync(fileUri, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
 
-        const blob = await response.blob();
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = fileName || `StudentReport_${new Date().toISOString().slice(0, 10)}.xlsx`;
-        document.body.appendChild(link); // Attach to DOM for Firefox compatibility
-        link.click();
-        link.remove();
-        URL.revokeObjectURL(link.href);
-      } else if (await Sharing.isAvailableAsync()) {
-        // Mobile: Use Sharing API
-        await Sharing.shareAsync(fileUri);
-      } else {
-        Alert.alert("Download Error", "Sharing is not supported on this device.");
+          await FileSystem.StorageAccessFramework.createFileAsync(
+            downloadUri,
+            fileName,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          ).then(async (newUri) => {
+            await FileSystem.writeAsStringAsync(newUri, fileContent, {
+              encoding: FileSystem.EncodingType.Base64,
+            });
+          });
+
+          Alert.alert(
+            "Download Complete",
+            `File saved to Downloads folder as ${fileName}`
+          );
+        }
+      } else if (Platform.OS === "ios") {
+        const downloadPath = FileSystem.documentDirectory + fileName;
+        await FileSystem.copyAsync({
+          from: fileUri,
+          to: downloadPath,
+        });
+        Alert.alert("Download Complete", `File saved to: ${fileName}`);
       }
     } catch (error) {
-      Alert.alert("Download Error", "Failed to download or share the report.");
-      console.error("Download failed:", error);
+      console.error("Download error:", error);
+      Alert.alert("Error", `Failed to download: ${error.message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color="#4CAF50" />
+        <Text style={styles.loadingText}>Generating Report...</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -316,12 +1177,10 @@ const MonthlyPlanForm = () => {
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>
-          Action Plan Based on the Counseling
-        </Text>
+        <Text style={styles.sectionTitle}>Action Plan Based on Counseling</Text>
         <TextInput
           style={styles.input}
-          placeholder="Enter action plan based on counseling here"
+          placeholder="Enter counseling-based plan here"
           value={formData.counselingPlan}
           onChangeText={(text) => handleInputChange("counselingPlan", text)}
           multiline
@@ -329,23 +1188,32 @@ const MonthlyPlanForm = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <Link
-          href={{
-            pathname: "/FriendsAndEssayForm",
-            params: { studentInfo: JSON.stringify(combinedData) },
-          }}
-          style={styles.link}
+        <TouchableOpacity
+          onPress={() => router.push("/FriendsAndEssayForm")}
+          style={[styles.button, styles.previousButton]}
         >
-          <Text style={styles.previousButton}>Previous</Text>
-        </Link>
+          <Text style={styles.buttonText}>Previous</Text>
+        </TouchableOpacity>
 
-        <Button
-          title="Download Report"
+        <TouchableOpacity
           onPress={handleDownload}
-          color="#2196F3"
-        />
+          style={[styles.button, styles.downloadButton]}
+          disabled={isLoading}
+        >
+          <Text style={styles.buttonText}>
+            {isLoading ? "Processing..." : "Download Report"}
+          </Text>
+        </TouchableOpacity>
 
-        <Button title="Submit" onPress={handleSubmit} color="#4CAF50" />
+        <TouchableOpacity
+          onPress={handleSubmit}
+          style={[styles.button, styles.submitButton]}
+          disabled={isLoading}
+        >
+          <Text style={styles.buttonText}>
+            {isLoading ? "Processing..." : "Submit"}
+          </Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -356,6 +1224,15 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: "#f8f9fa",
+  },
+  loadingContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 20,
+  },
+  loadingText: {
+    fontSize: 18,
+    color: "#333",
   },
   section: {
     marginBottom: 20,
@@ -381,17 +1258,26 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     gap: 10,
   },
-  link: {
-    padding: 10,
-    backgroundColor: "#FF6F61",
+  button: {
+    flex: 1,
+    padding: 12,
     borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
   },
-  previousButton: {
+  buttonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  previousButton: {
+    backgroundColor: "#FF6F61",
+  },
+  downloadButton: {
+    backgroundColor: "#2196F3",
+  },
+  submitButton: {
+    backgroundColor: "#4CAF50",
   },
 });
 

@@ -215,32 +215,73 @@
 
 
 
+// const { getDefaultConfig } = require('expo/metro-config');
+// const { mergeConfig } = require('metro-config');
+// const path = require('path');
+
+// const defaultConfig = getDefaultConfig(__dirname);
+
+// // Corrected module resolutions
+// const extraNodeModules = {
+//   ...defaultConfig.resolver.extraNodeModules,
+//   // Update Supabase resolution:
+//   '@supabase/postgrest-js': require.resolve('@supabase/postgrest-js'),
+//   // Other resolutions remain the same
+//   '@radix-ui/react-slot': require.resolve('@radix-ui/react-slot'),
+//   'merge-options': require.resolve('merge-options'),
+//   'ws': require.resolve('ws'),
+//   // Your existing polyfills...
+//   net: require.resolve('react-native-tcp'),
+//   crypto: require.resolve('crypto-browserify'),
+//   stream: require.resolve('stream-browserify'),
+//   buffer: require.resolve('buffer/'),
+//   process: require.resolve('process/browser'),
+//   util: require.resolve('util/'),
+//   http: require.resolve('stream-http'),
+//   https: require.resolve('https-browserify'),
+//   tls: require.resolve('react-native-tls'),
+//   zlib: require.resolve('browserify-zlib')
+// };
+
+// const config = {
+//   transformer: {
+//     ...defaultConfig.transformer,
+//     babelTransformerPath: require.resolve('react-native-svg-transformer'),
+//     unstable_allowRequireContext: true,
+//   },
+//   resolver: {
+//     ...defaultConfig.resolver,
+//     extraNodeModules,
+//     resolverMainFields: ['react-native', 'browser', 'main'],
+//     assetExts: [...defaultConfig.resolver.assetExts, 'pem', 'crt', 'key'],
+//     sourceExts: [...defaultConfig.resolver.sourceExts, 'mjs', 'cjs'],
+//   },
+//   maxWorkers: 2,
+//   resetCache: true
+// };
+
+// module.exports = mergeConfig(defaultConfig, config);
+
+
 const { getDefaultConfig } = require('expo/metro-config');
 const { mergeConfig } = require('metro-config');
 const path = require('path');
 
 const defaultConfig = getDefaultConfig(__dirname);
 
-// Corrected module resolutions
+// ✅ Safe polyfills for browser compatibility
 const extraNodeModules = {
-  ...defaultConfig.resolver.extraNodeModules,
-  // Update Supabase resolution:
   '@supabase/postgrest-js': require.resolve('@supabase/postgrest-js'),
-  // Other resolutions remain the same
   '@radix-ui/react-slot': require.resolve('@radix-ui/react-slot'),
   'merge-options': require.resolve('merge-options'),
-  'ws': require.resolve('ws'),
-  // Your existing polyfills...
-  net: require.resolve('react-native-tcp'),
-  crypto: require.resolve('crypto-browserify'),
+
+  // ✅ Only keep browser-safe polyfills
   stream: require.resolve('stream-browserify'),
   buffer: require.resolve('buffer/'),
+  crypto: require.resolve('crypto-browserify'),
   process: require.resolve('process/browser'),
   util: require.resolve('util/'),
-  http: require.resolve('stream-http'),
-  https: require.resolve('https-browserify'),
-  tls: require.resolve('react-native-tls'),
-  zlib: require.resolve('browserify-zlib')
+  path: require.resolve('path-browserify'),
 };
 
 const config = {
@@ -257,7 +298,7 @@ const config = {
     sourceExts: [...defaultConfig.resolver.sourceExts, 'mjs', 'cjs'],
   },
   maxWorkers: 2,
-  resetCache: true
+  resetCache: true,
 };
 
 module.exports = mergeConfig(defaultConfig, config);

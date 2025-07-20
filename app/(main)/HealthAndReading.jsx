@@ -210,15 +210,15 @@ const HealthAndReading = () => {
     {
       title: "Books Read and Ladder Progress",
       fields: [
-        { key: "ladderBooks", placeholder: "List books from the ladder", value: data.ladderBooks },
-        { key: "otherBooks", placeholder: "List other books read", value: data.otherBooks },
+        { key: "ladderBooks", placeholder: "Names of the ladder books/videos read", value: data.ladderBooks },
+        { key: "otherBooks", placeholder: "Names of the other books/videos read", value: data.otherBooks },
       ],
     },
     {
       title: "Ladder Progress and Reviewed Books",
       fields: [
-        { key: "ladderStatus", placeholder: "Enter your ladder progress status", value: data.ladderStatus },
-        { key: "reviewedBooks", placeholder: "Books you've reviewed", value: data.reviewedBooks },
+        { key: "ladderStatus", placeholder: "Ladder staus(books-videos read/ books-videos to be read)", value: data.ladderStatus },
+        { key: "reviewedBooks", placeholder: "Books/ videos reviewedcl", value: data.reviewedBooks },
       ],
     },
   ];

@@ -999,6 +999,293 @@
 
 
 
+// import React, { useState, useEffect } from "react";
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   StyleSheet,
+//   ScrollView,
+//   Alert,
+//   TouchableOpacity,
+//   Platform,
+//   ActivityIndicator,
+// } from "react-native";
+// import { useRouter } from "expo-router";
+// import * as Sharing from "expo-sharing";
+// import * as FileSystem from "expo-file-system";
+// import { generateExcelFile } from "../../utils/generateExcelFile";
+// import { useAppData } from "../../contexts/AppDataContext";
+
+// const MonthlyPlanForm = () => {
+//   const router = useRouter();
+//   const { sectionData, updateSectionData } = useAppData(); // Fix: Ensure updates are saved
+//   const [formData, setFormData] = useState({
+//     actionPlan: sectionData?.monthlyPlan?.actionPlan || "",
+//     mentorComments: sectionData?.monthlyPlan?.mentorComments || "",
+//     counselingPlan: sectionData?.monthlyPlan?.counselingPlan || "",
+//   });
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   // Save form data to context whenever it changes
+//   useEffect(() => {
+//     updateSectionData("monthlyPlan", formData);
+//   }, [formData]);
+
+//   const getCombinedData = () => {
+//     const academicProgress = Array(8)
+//       .fill()
+//       .map((_, index) => {
+//         const item = sectionData?.academicProgress?.[index] || {};
+//         return {
+//           subject: item.subject || `Subject ${index + 1}`,
+//           selfAssessment: item.selfAssessment || "",
+//           justification: item.justification || "",
+//         };
+//       });
+//     return {
+//       thinkingExercise: sectionData?.home?.thinkingExercise,
+//       month: sectionData?.home?.month,
+//       college: sectionData?.home?.college,
+//       yearOfStudy: sectionData?.home?.yearOfStudy,
+//       academicProgress: academicProgress,
+//       coCurricular: sectionData?.coCurricular || {},
+//       healthAndReading: sectionData?.healthAndReading || {},
+//       friendsAndEssay: sectionData?.friendsAndEssay || {},
+//       monthlyPlan: formData,
+//     };
+//   };
+
+//   const validateData = (data) => {
+//     if (!data.monthlyPlan.actionPlan.trim()) {
+//       Alert.alert("Validation Error", "Action Plan cannot be empty.");
+//       return false;
+//     }
+//     return true;
+//   };
+
+//   const handleInputChange = (key, value) => {
+//     setFormData((prev) => ({ ...prev, [key]: value }));
+//   };
+
+//   const handleSubmit = async () => {
+//     const combinedData = getCombinedData();
+//     if (!validateData(combinedData)) return;
+
+//     setIsLoading(true);
+//     try {
+//       const { fileUri } = await generateExcelFile(combinedData);
+
+//       if (Platform.OS === "web") {
+//         Alert.alert("Success", "Report downloaded automatically!");
+//       } else if (await Sharing.isAvailableAsync()) {
+//         await Sharing.shareAsync(fileUri);
+//       } else {
+//         Alert.alert("Success", "Report saved to your device!");
+//       }
+
+//       router.replace("/Home");
+//     } catch (error) {
+//       console.error("Submission error:", error);
+//       Alert.alert(
+//         "Error",
+//         `Failed to generate report: ${error.message || "Unknown error"}`
+//       );
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   const handleDownload = async () => {
+//     const combinedData = getCombinedData();
+//     setIsLoading(true);
+
+//     try {
+//       const { fileUri, fileName } = await generateExcelFile(combinedData);
+
+//       if (Platform.OS === "android") {
+//         const permissions =
+//           await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync();
+//         if (permissions.granted) {
+//           const downloadUri = permissions.directoryUri;
+//           const fileContent = await FileSystem.readAsStringAsync(fileUri, {
+//             encoding: FileSystem.EncodingType.Base64,
+//           });
+
+//           await FileSystem.StorageAccessFramework.createFileAsync(
+//             downloadUri,
+//             fileName,
+//             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+//           ).then(async (newUri) => {
+//             await FileSystem.writeAsStringAsync(newUri, fileContent, {
+//               encoding: FileSystem.EncodingType.Base64,
+//             });
+//           });
+
+//           Alert.alert(
+//             "Download Complete",
+//             `File saved to Downloads folder as ${fileName}`
+//           );
+//         }
+//       } else if (Platform.OS === "ios") {
+//         const downloadPath = FileSystem.documentDirectory + fileName;
+//         await FileSystem.copyAsync({
+//           from: fileUri,
+//           to: downloadPath,
+//         });
+//         Alert.alert("Download Complete", `File saved to: ${fileName}`);
+//       }
+//     } catch (error) {
+//       console.error("Download error:", error);
+//       Alert.alert("Error", `Failed to download: ${error.message}`);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   if (isLoading) {
+//     return (
+//       <View style={[styles.container, styles.loadingContainer]}>
+//         <ActivityIndicator size="large" color="#4CAF50" />
+//         <Text style={styles.loadingText}>Generating Report...</Text>
+//       </View>
+//     );
+//   }
+
+//   return (
+//     <ScrollView style={styles.container}>
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Action Plan for the Coming Month</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter your action plan here"
+//           value={formData.actionPlan}
+//           onChangeText={(text) => handleInputChange("actionPlan", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Comments by the Mentor</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter mentor's comments here"
+//           value={formData.mentorComments}
+//           onChangeText={(text) => handleInputChange("mentorComments", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.section}>
+//         <Text style={styles.sectionTitle}>Action Plan Based on Counseling</Text>
+//         <TextInput
+//           style={styles.input}
+//           placeholder="Enter counseling-based plan here"
+//           value={formData.counselingPlan}
+//           onChangeText={(text) => handleInputChange("counselingPlan", text)}
+//           multiline
+//         />
+//       </View>
+
+//       <View style={styles.buttonContainer}>
+//         <TouchableOpacity
+//           onPress={() => router.push("/FriendsAndEssayForm")}
+//           style={[styles.button, styles.previousButton]}
+//         >
+//           <Text style={styles.buttonText}>Previous</Text>
+//         </TouchableOpacity>
+
+//         <TouchableOpacity
+//           onPress={handleDownload}
+//           style={[styles.button, styles.downloadButton]}
+//           disabled={isLoading}
+//         >
+//           <Text style={styles.buttonText}>
+//             {isLoading ? "Processing..." : "Download Report"}
+//           </Text>
+//         </TouchableOpacity>
+
+//         <TouchableOpacity
+//           onPress={handleSubmit}
+//           style={[styles.button, styles.submitButton]}
+//           disabled={isLoading}
+//         >
+//           <Text style={styles.buttonText}>
+//             {isLoading ? "Processing..." : "Submit"}
+//           </Text>
+//         </TouchableOpacity>
+//       </View>
+//     </ScrollView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     padding: 20,
+//     backgroundColor: "#f8f9fa",
+//   },
+//   loadingContainer: {
+//     justifyContent: "center",
+//     alignItems: "center",
+//     gap: 20,
+//   },
+//   loadingText: {
+//     fontSize: 18,
+//     color: "#333",
+//   },
+//   section: {
+//     marginBottom: 20,
+//   },
+//   sectionTitle: {
+//     fontSize: 16,
+//     fontWeight: "bold",
+//     marginBottom: 10,
+//     color: "#333",
+//   },
+//   input: {
+//     borderWidth: 1,
+//     borderColor: "#ccc",
+//     borderRadius: 5,
+//     padding: 10,
+//     minHeight: 50,
+//     backgroundColor: "#fff",
+//     textAlignVertical: "top",
+//   },
+//   buttonContainer: {
+//     marginTop: 20,
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     gap: 10,
+//   },
+//   button: {
+//     flex: 1,
+//     padding: 12,
+//     borderRadius: 5,
+//     alignItems: "center",
+//     justifyContent: "center",
+//   },
+//   buttonText: {
+//     color: "#fff",
+//     fontSize: 16,
+//     fontWeight: "bold",
+//   },
+//   previousButton: {
+//     backgroundColor: "#FF6F61",
+//   },
+//   downloadButton: {
+//     backgroundColor: "#2196F3",
+//   },
+//   submitButton: {
+//     backgroundColor: "#4CAF50",
+//   },
+// });
+
+// export default MonthlyPlanForm;
+
+
+
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -1010,6 +1297,7 @@ import {
   TouchableOpacity,
   Platform,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useRouter } from "expo-router";
 import * as Sharing from "expo-sharing";
@@ -1019,7 +1307,8 @@ import { useAppData } from "../../contexts/AppDataContext";
 
 const MonthlyPlanForm = () => {
   const router = useRouter();
-  const { sectionData, updateSectionData } = useAppData(); // Fix: Ensure updates are saved
+  const { sectionData, updateSectionData } = useAppData();
+
   const [formData, setFormData] = useState({
     actionPlan: sectionData?.monthlyPlan?.actionPlan || "",
     mentorComments: sectionData?.monthlyPlan?.mentorComments || "",
@@ -1027,7 +1316,6 @@ const MonthlyPlanForm = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
 
-  // Save form data to context whenever it changes
   useEffect(() => {
     updateSectionData("monthlyPlan", formData);
   }, [formData]);
@@ -1048,7 +1336,7 @@ const MonthlyPlanForm = () => {
       month: sectionData?.home?.month,
       college: sectionData?.home?.college,
       yearOfStudy: sectionData?.home?.yearOfStudy,
-      academicProgress: academicProgress,
+      academicProgress,
       coCurricular: sectionData?.coCurricular || {},
       healthAndReading: sectionData?.healthAndReading || {},
       friendsAndEssay: sectionData?.friendsAndEssay || {},
@@ -1075,7 +1363,6 @@ const MonthlyPlanForm = () => {
     setIsLoading(true);
     try {
       const { fileUri } = await generateExcelFile(combinedData);
-
       if (Platform.OS === "web") {
         Alert.alert("Success", "Report downloaded automatically!");
       } else if (await Sharing.isAvailableAsync()) {
@@ -1087,10 +1374,7 @@ const MonthlyPlanForm = () => {
       router.replace("/Home");
     } catch (error) {
       console.error("Submission error:", error);
-      Alert.alert(
-        "Error",
-        `Failed to generate report: ${error.message || "Unknown error"}`
-      );
+      Alert.alert("Error", `Failed to generate report: ${error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -1122,18 +1406,12 @@ const MonthlyPlanForm = () => {
             });
           });
 
-          Alert.alert(
-            "Download Complete",
-            `File saved to Downloads folder as ${fileName}`
-          );
+          Alert.alert("Download Complete", `File saved as ${fileName}`);
         }
       } else if (Platform.OS === "ios") {
         const downloadPath = FileSystem.documentDirectory + fileName;
-        await FileSystem.copyAsync({
-          from: fileUri,
-          to: downloadPath,
-        });
-        Alert.alert("Download Complete", `File saved to: ${fileName}`);
+        await FileSystem.copyAsync({ from: fileUri, to: downloadPath });
+        Alert.alert("Download Complete", `File saved as ${fileName}`);
       }
     } catch (error) {
       console.error("Download error:", error);
@@ -1153,124 +1431,136 @@ const MonthlyPlanForm = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Action Plan for the Coming Month</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter your action plan here"
-          value={formData.actionPlan}
-          onChangeText={(text) => handleInputChange("actionPlan", text)}
-          multiline
-        />
-      </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={{ flex: 1 }}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.card}>
+          <Text style={styles.title}>Action Plan for the Coming Month</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter your action plan here"
+            value={formData.actionPlan}
+            onChangeText={(text) => handleInputChange("actionPlan", text)}
+            multiline
+          />
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Comments by the Mentor</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter mentor's comments here"
-          value={formData.mentorComments}
-          onChangeText={(text) => handleInputChange("mentorComments", text)}
-          multiline
-        />
-      </View>
+        <View style={styles.card}>
+          <Text style={styles.title}>Comments by the Mentor</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter mentor's comments here"
+            value={formData.mentorComments}
+            onChangeText={(text) => handleInputChange("mentorComments", text)}
+            multiline
+          />
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Action Plan Based on Counseling</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter counseling-based plan here"
-          value={formData.counselingPlan}
-          onChangeText={(text) => handleInputChange("counselingPlan", text)}
-          multiline
-        />
-      </View>
+        <View style={styles.card}>
+          <Text style={styles.title}>Action Plan Based on Counseling</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter counseling-based plan here"
+            value={formData.counselingPlan}
+            onChangeText={(text) => handleInputChange("counselingPlan", text)}
+            multiline
+          />
+        </View>
 
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          onPress={() => router.push("/FriendsAndEssayForm")}
-          style={[styles.button, styles.previousButton]}
-        >
-          <Text style={styles.buttonText}>Previous</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity
+            onPress={() => router.push("/FriendsAndEssayForm")}
+            style={[styles.button, styles.backButton]}
+          >
+            <Text style={styles.buttonText}>Previous</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={handleDownload}
-          style={[styles.button, styles.downloadButton]}
-          disabled={isLoading}
-        >
-          <Text style={styles.buttonText}>
-            {isLoading ? "Processing..." : "Download Report"}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleDownload}
+            style={[styles.button, styles.downloadButton]}
+          >
+            <Text style={styles.buttonText}>Download</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={handleSubmit}
-          style={[styles.button, styles.submitButton]}
-          disabled={isLoading}
-        >
-          <Text style={styles.buttonText}>
-            {isLoading ? "Processing..." : "Submit"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          <TouchableOpacity
+            onPress={handleSubmit}
+            style={[styles.button, styles.submitButton]}
+          >
+            <Text style={styles.buttonText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
+  scrollContainer: {
+    padding: 20,
+    backgroundColor: "#f0f2f5",
+    justifyContent: "center",
+  },
   container: {
     flex: 1,
+    backgroundColor: "#f0f2f5",
     padding: 20,
-    backgroundColor: "#f8f9fa",
   },
   loadingContainer: {
     justifyContent: "center",
     alignItems: "center",
-    gap: 20,
+    gap: 16,
   },
   loadingText: {
-    fontSize: 18,
+    fontSize: 16,
     color: "#333",
   },
-  section: {
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 20,
     marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
   },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
+  title: {
+    fontSize: 18,
+    fontWeight: "600",
     marginBottom: 10,
     color: "#333",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 5,
-    padding: 10,
-    minHeight: 50,
-    backgroundColor: "#fff",
+    borderColor: "#ddd",
+    borderRadius: 10,
+    padding: 12,
+    minHeight: 100,
+    backgroundColor: "#fefefe",
+    fontSize: 15,
     textAlignVertical: "top",
   },
   buttonContainer: {
-    marginTop: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 10,
+    marginTop: 10,
   },
   button: {
     flex: 1,
-    padding: 12,
-    borderRadius: 5,
+    paddingVertical: 12,
+    borderRadius: 10,
     alignItems: "center",
-    justifyContent: "center",
   },
   buttonText: {
     color: "#fff",
-    fontSize: 16,
     fontWeight: "bold",
+    fontSize: 15,
   },
-  previousButton: {
+  backButton: {
     backgroundColor: "#FF6F61",
   },
   downloadButton: {

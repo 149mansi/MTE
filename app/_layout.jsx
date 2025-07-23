@@ -68,7 +68,7 @@
 
 
 
-
+import '../_global-shims'; // <-- make sure the path is correct
 import React from 'react';  // Make sure React is imported
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { Stack, useRouter } from 'expo-router';

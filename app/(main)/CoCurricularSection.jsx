@@ -1422,6 +1422,437 @@
 // export default CoCurricularsection;
 
 
+// import React, { useState, useEffect } from "react";
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   Button,
+//   StyleSheet,
+//   TouchableOpacity,
+//   ScrollView,
+//   KeyboardAvoidingView,
+//   Platform,
+// } from "react-native";
+// import { Link } from "expo-router";
+// import { useAppData } from "../../contexts/AppDataContext";
+
+// const CoCurricularsection = ({ route }) => {
+//   const { sectionData, updateSectionData } = useAppData();
+//   const previousData = sectionData.coCurricular || {};
+//   const academicData = route?.params?.academicData || {};
+
+//   const [currentSection, setCurrentSection] = useState(0);
+//   const [combinedData, setCombinedData] = useState({
+//     realLifeProject: "",
+//     extraEnglish: "",
+//     CoandExtraCurricularProgressPlan: "",
+//     examResults: "",
+//     financialRequirements: "",
+//     difficulties: "",
+//   });
+
+//   const sections = [
+//     {
+//       label: "Real Life Project",
+//       key: "realLifeProject",
+//       placeholder: "Enter your real-life project details",
+//     },
+//     {
+//       label: "Extra English",
+//       key: "extraEnglish",
+//       placeholder: "Enter your extra English details",
+//     },
+//     {
+//       label: "Co- & Extra-Curricular Progress Plan",
+//       key: "CoandExtraCurricularProgressPlan",
+//       placeholder: "Describe your progress plans",
+//     },
+//     {
+//       label: "Exam Results",
+//       key: "examResults",
+//       placeholder: "Enter your exam results",
+//     },
+//     {
+//       label: "Financial Requirements",
+//       key: "financialRequirements",
+//       placeholder: "Enter your financial needs for next 3 months",
+//     },
+//     {
+//       label: "Difficulties",
+//       key: "difficulties",
+//       placeholder: "Mention social, family or personal challenges",
+//     },
+//   ];
+
+//   useEffect(() => {
+//     setCombinedData((prev) => ({
+//       ...prev,
+//       ...previousData,
+//       ...academicData,
+//     }));
+//   }, []);
+
+//   useEffect(() => {
+//     updateSectionData("coCurricular", combinedData);
+//   }, [combinedData]);
+
+//   const handleChange = (key, value) => {
+//     setCombinedData((prev) => ({
+//       ...prev,
+//       [key]: value,
+//     }));
+//   };
+
+//   const handleNext = () => {
+//     if (currentSection < sections.length - 1) {
+//       setCurrentSection((prev) => prev + 1);
+//     }
+//   };
+
+//   const handlePrevious = () => {
+//     if (currentSection > 0) {
+//       setCurrentSection((prev) => prev - 1);
+//     }
+//   };
+
+//   const section = sections[currentSection];
+
+//   return (
+//     <KeyboardAvoidingView
+//       style={{ flex: 1 }}
+//       behavior={Platform.OS === "ios" ? "padding" : "height"}
+//     >
+//       <ScrollView contentContainerStyle={styles.container}>
+//         <View style={styles.card}>
+//           <Text style={styles.label}>{section.label}</Text>
+//           <TextInput
+//             style={styles.input}
+//             placeholder={section.placeholder}
+//             value={combinedData[section.key]}
+//             onChangeText={(text) => handleChange(section.key, text)}
+//             multiline
+//             textAlignVertical="top"
+//           />
+//         </View>
+
+//         <View style={styles.buttonContainer}>
+//           <View style={styles.buttonWrapper}>
+//             {currentSection === 0 ? (
+//               <Link
+//                 href={{
+//                   pathname: "/AcademicProgress",
+//                   params: { combinedData },
+//                 }}
+//                 style={styles.navButton}
+//               >
+//                 <Text style={styles.navButtonText}>Previous</Text>
+//               </Link>
+//             ) : (
+//               <TouchableOpacity onPress={handlePrevious} style={styles.navButton}>
+//                 <Text style={styles.navButtonText}>Previous</Text>
+//               </TouchableOpacity>
+//             )}
+//           </View>
+
+//           <View style={styles.buttonWrapper}>
+//             {currentSection < sections.length - 1 ? (
+//               <TouchableOpacity onPress={handleNext} style={styles.navButton}>
+//                 <Text style={styles.navButtonText}>Next</Text>
+//               </TouchableOpacity>
+//             ) : (
+//               <Link
+//                 href={{
+//                   pathname: "/HealthAndReading",
+//                   params: { combinedData },
+//                 }}
+//                 style={styles.navButton}
+//               >
+//                 <Text style={styles.navButtonText}>Next</Text>
+//               </Link>
+//             )}
+//           </View>
+//         </View>
+//       </ScrollView>
+//     </KeyboardAvoidingView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     padding: 20,
+//     paddingTop: 40,
+//     backgroundColor: "#F2F4F8",
+//     flexGrow: 1,
+//     justifyContent: "center",
+//   },
+//   card: {
+//     backgroundColor: "#ffffff",
+//     borderRadius: 16,
+//     padding: 20,
+//     marginBottom: 30,
+//     shadowColor: "#000",
+//     shadowOffset: { width: 0, height: 6 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 10,
+//     elevation: 6,
+//   },
+//   label: {
+//     fontSize: 20,
+//     fontWeight: "600",
+//     marginBottom: 12,
+//     color: "#333",
+//   },
+//   input: {
+//     backgroundColor: "#fdfdfd",
+//     borderRadius: 12,
+//     borderColor: "#ddd",
+//     borderWidth: 1,
+//     padding: 14,
+//     fontSize: 16,
+//     height: 150,
+//   },
+//   buttonContainer: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     gap: 10,
+//   },
+//   buttonWrapper: {
+//     flex: 1,
+//   },
+//   navButton: {
+//     backgroundColor: "#FF6F61",
+//     paddingVertical: 12,
+//     borderRadius: 10,
+//     alignItems: "center",
+//   },
+//   navButtonText: {
+//     color: "#fff",
+//     fontWeight: "bold",
+//     fontSize: 16,
+//   },
+// });
+
+// export default CoCurricularsection;
+
+
+
+// import React, { useState, useEffect } from "react";
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   Button,
+//   StyleSheet,
+//   TouchableOpacity,
+//   ScrollView,
+//   KeyboardAvoidingView,
+//   Platform,
+// } from "react-native";
+// import { Link } from "expo-router";
+// import { useAppData } from "../../contexts/AppDataContext";
+
+// const CoCurricularsection = ({ route }) => {
+//   const { sectionData, updateSectionData } = useAppData();
+//   const previousData = sectionData.coCurricular || {};
+//   const academicData = route?.params?.academicData || {};
+
+//   const [currentSection, setCurrentSection] = useState(0);
+//   const [combinedData, setCombinedData] = useState({
+//     realLifeProject: "",
+//     extraEnglish: "",
+//     CoandExtraCurricularProgressPlan: "",
+//     examResults: "",
+//     financialRequirements: "",
+//     difficulties: "",
+//   });
+
+//   const sections = [
+//     {
+//       label: "Real Life Project",
+//       key: "realLifeProject",
+//       placeholder: "Enter your real-life project details",
+//     },
+//     {
+//       label: "Extra English",
+//       key: "extraEnglish",
+//       placeholder: "Enter your extra English details",
+//     },
+//     {
+//       label: "Co- & Extra-Curricular Progress Plan",
+//       key: "CoandExtraCurricularProgressPlan",
+//       placeholder: "Describe your progress plans",
+//     },
+//     {
+//       label: "Exam Results",
+//       key: "examResults",
+//       placeholder: "Enter your exam results",
+//     },
+//     {
+//       label: "Financial Requirements",
+//       key: "financialRequirements",
+//       placeholder: "Enter your financial needs for next 3 months",
+//     },
+//     {
+//       label: "Difficulties",
+//       key: "difficulties",
+//       placeholder: "Mention social, family or personal challenges",
+//     },
+//   ];
+
+//   useEffect(() => {
+//     setCombinedData((prev) => ({
+//       ...prev,
+//       ...previousData,
+//       ...academicData,
+//     }));
+//   }, []);
+
+//   useEffect(() => {
+//     updateSectionData("coCurricular", combinedData);
+//   }, [combinedData]);
+
+//   const handleChange = (key, value) => {
+//     setCombinedData((prev) => ({
+//       ...prev,
+//       [key]: value,
+//     }));
+//   };
+
+//   const handleNext = () => {
+//     if (currentSection < sections.length - 1) {
+//       setCurrentSection((prev) => prev + 1);
+//     }
+//   };
+
+//   const handlePrevious = () => {
+//     if (currentSection > 0) {
+//       setCurrentSection((prev) => prev - 1);
+//     }
+//   };
+
+//   const section = sections[currentSection];
+
+//   return (
+//     <KeyboardAvoidingView
+//       style={{ flex: 1 }}
+//       behavior={Platform.OS === "ios" ? "padding" : "height"}
+//     >
+//       <ScrollView contentContainerStyle={styles.container}>
+//         <View style={styles.card}>
+//           <Text style={styles.label}>{section.label}</Text>
+//           <TextInput
+//             style={styles.input}
+//             placeholder={section.placeholder}
+//             value={combinedData[section.key]}
+//             onChangeText={(text) => handleChange(section.key, text)}
+//             multiline
+//             textAlignVertical="top"
+//           />
+          
+//           <View style={styles.buttonContainer}>
+//             <View style={styles.buttonWrapper}>
+//               {currentSection === 0 ? (
+//                 <Link
+//                   href={{
+//                     pathname: "/AcademicProgress",
+//                     params: { combinedData },
+//                   }}
+//                   style={styles.navButton}
+//                 >
+//                   <Text style={styles.navButtonText}>Previous</Text>
+//                 </Link>
+//               ) : (
+//                 <TouchableOpacity onPress={handlePrevious} style={styles.navButton}>
+//                   <Text style={styles.navButtonText}>Previous</Text>
+//                 </TouchableOpacity>
+//               )}
+//             </View>
+
+//             <View style={styles.buttonWrapper}>
+//               {currentSection < sections.length - 1 ? (
+//                 <TouchableOpacity onPress={handleNext} style={styles.navButton}>
+//                   <Text style={styles.navButtonText}>Next</Text>
+//                 </TouchableOpacity>
+//               ) : (
+//                 <Link
+//                   href={{
+//                     pathname: "/HealthAndReading",
+//                     params: { combinedData },
+//                   }}
+//                   style={styles.navButton}
+//                 >
+//                   <Text style={styles.navButtonText}>Next</Text>
+//                 </Link>
+//               )}
+//             </View>
+//           </View>
+//         </View>
+//       </ScrollView>
+//     </KeyboardAvoidingView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     padding: 20,
+//     paddingTop: 40,
+//     backgroundColor: "#F2F4F8",
+//     flexGrow: 1,
+//     justifyContent: "center",
+//   },
+//   card: {
+//     backgroundColor: "#ffffff",
+//     borderRadius: 16,
+//     padding: 20,
+//     marginBottom: 30,
+//     shadowColor: "#000",
+//     shadowOffset: { width: 0, height: 6 },
+//     shadowOpacity: 0.1,
+//     shadowRadius: 10,
+//     elevation: 6,
+//   },
+//   label: {
+//     fontSize: 20,
+//     fontWeight: "600",
+//     marginBottom: 12,
+//     color: "#333",
+//   },
+//   input: {
+//     backgroundColor: "#fdfdfd",
+//     borderRadius: 12,
+//     borderColor: "#ddd",
+//     borderWidth: 1,
+//     padding: 14,
+//     fontSize: 16,
+//     height: 150,
+//     marginBottom: 20,
+//   },
+//   buttonContainer: {
+//     flexDirection: "row",
+//     justifyContent: "space-between",
+//     gap: 10,
+//     marginTop: 10,
+//   },
+//   buttonWrapper: {
+//     flex: 1,
+//   },
+//   navButton: {
+//     backgroundColor: "#FF6F61",
+//     paddingVertical: 12,
+//     borderRadius: 10,
+//     alignItems: "center",
+//   },
+//   navButtonText: {
+//     color: "#fff",
+//     fontWeight: "bold",
+//     fontSize: 16,
+//   },
+// });
+
+// export default CoCurricularsection;
+
+
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -1534,42 +1965,46 @@ const CoCurricularsection = ({ route }) => {
             multiline
             textAlignVertical="top"
           />
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <View style={styles.buttonWrapper}>
+          
+          <View style={[
+            styles.buttonContainer,
+            currentSection === 0 && styles.firstSectionButtons,
+            currentSection === sections.length - 1 && styles.lastSectionButtons
+          ]}>
             {currentSection === 0 ? (
-              <Link
-                href={{
-                  pathname: "/AcademicProgress",
-                  params: { combinedData },
-                }}
-                style={styles.navButton}
-              >
-                <Text style={styles.navButtonText}>Previous</Text>
-              </Link>
+              <View style={styles.centeredButton}>
+                <Link
+                  href={{
+                    pathname: "/AcademicProgress",
+                    params: { combinedData },
+                  }}
+                  style={styles.navButton}
+                >
+                  <Text style={styles.navButtonText}>Previous</Text>
+                </Link>
+              </View>
             ) : (
               <TouchableOpacity onPress={handlePrevious} style={styles.navButton}>
                 <Text style={styles.navButtonText}>Previous</Text>
               </TouchableOpacity>
             )}
-          </View>
 
-          <View style={styles.buttonWrapper}>
-            {currentSection < sections.length - 1 ? (
+            {currentSection === sections.length - 1 ? (
+              <View style={styles.centeredButton}>
+                <Link
+                  href={{
+                    pathname: "/HealthAndReading",
+                    params: { combinedData },
+                  }}
+                  style={styles.navButton}
+                >
+                  <Text style={styles.navButtonText}>Next</Text>
+                </Link>
+              </View>
+            ) : (
               <TouchableOpacity onPress={handleNext} style={styles.navButton}>
                 <Text style={styles.navButtonText}>Next</Text>
               </TouchableOpacity>
-            ) : (
-              <Link
-                href={{
-                  pathname: "/HealthAndReading",
-                  params: { combinedData },
-                }}
-                style={styles.navButton}
-              >
-                <Text style={styles.navButtonText}>Next</Text>
-              </Link>
             )}
           </View>
         </View>
@@ -1611,20 +2046,30 @@ const styles = StyleSheet.create({
     padding: 14,
     fontSize: 16,
     height: 150,
+    marginBottom: 20,
   },
   buttonContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     gap: 10,
+    marginTop: 10,
   },
-  buttonWrapper: {
-    flex: 1,
+  firstSectionButtons: {
+    justifyContent: "center",
+  },
+  lastSectionButtons: {
+    justifyContent: "center",
+  },
+  centeredButton: {
+    width: "50%",
+    alignSelf: "center",
   },
   navButton: {
     backgroundColor: "#FF6F61",
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: "center",
+    flex: 1,
   },
   navButtonText: {
     color: "#fff",

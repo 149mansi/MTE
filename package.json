@@ -45,8 +45,8 @@
     "docx": "^9.3.0",
     "eas-cli": "^16.15.0",
     "events": "^3.3.0",
-    "exceljs": "^4.4.0",
     "expo": "^53.0.20",
+    "expo-asset": "~11.1.7",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
     "expo-crypto": "~14.1.5",
@@ -100,7 +100,8 @@
     "url": "^0.11.4",
     "util": "^0.12.5",
     "vm-browserify": "1.1.2",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xlsx-style": "^0.8.13"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

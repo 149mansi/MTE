@@ -263,19 +263,109 @@
 // module.exports = mergeConfig(defaultConfig, config);
 
 
+// const { getDefaultConfig } = require('expo/metro-config');
+// const { mergeConfig } = require('metro-config');
+// const path = require('path');
+
+// const defaultConfig = getDefaultConfig(__dirname);
+
+// // ✅ Safe polyfills for browser compatibility
+// const extraNodeModules = {
+//   '@supabase/postgrest-js': require.resolve('@supabase/postgrest-js'),
+//   '@radix-ui/react-slot': require.resolve('@radix-ui/react-slot'),
+//   'merge-options': require.resolve('merge-options'),
+
+//   // ✅ Only keep browser-safe polyfills
+//   stream: require.resolve('stream-browserify'),
+//   buffer: require.resolve('buffer/'),
+//   crypto: require.resolve('crypto-browserify'),
+//   process: require.resolve('process/browser'),
+//   util: require.resolve('util/'),
+//   path: require.resolve('path-browserify'),
+// };
+
+// const config = {
+//   transformer: {
+//     ...defaultConfig.transformer,
+//     babelTransformerPath: require.resolve('react-native-svg-transformer'),
+//     unstable_allowRequireContext: true,
+//   },
+//   resolver: {
+//     ...defaultConfig.resolver,
+//     extraNodeModules,
+//     resolverMainFields: ['react-native', 'browser', 'main'],
+//     assetExts: [...defaultConfig.resolver.assetExts, 'pem', 'crt', 'key'],
+//     sourceExts: [...defaultConfig.resolver.sourceExts, 'mjs', 'cjs'],
+//   },
+//   maxWorkers: 2,
+//   resetCache: true,
+// };
+
+// module.exports = mergeConfig(defaultConfig, config);
+
+
+
+// const { getDefaultConfig } = require('expo/metro-config');
+// const { mergeConfig } = require('metro-config');
+// const path = require('path');
+
+// const defaultConfig = getDefaultConfig(__dirname);
+
+// // ✅ Safe polyfills for browser compatibility
+// const extraNodeModules = {
+//   '@supabase/postgrest-js': require.resolve('@supabase/postgrest-js'),
+//   '@radix-ui/react-slot': require.resolve('@radix-ui/react-slot'),
+//   'merge-options': require.resolve('merge-options'),
+
+//   stream: require.resolve('stream-browserify'),
+//   buffer: require.resolve('buffer/'),
+//   crypto: require.resolve('crypto-browserify'),
+//   process: require.resolve('process/browser'),
+//   util: require.resolve('util/'),
+//   path: require.resolve('path-browserify'),
+// };
+
+// const config = {
+//   transformer: {
+//     ...defaultConfig.transformer,
+//     babelTransformerPath: require.resolve('react-native-svg-transformer'),
+//     unstable_allowRequireContext: true,
+//   },
+//   resolver: {
+//     ...defaultConfig.resolver,
+//     extraNodeModules,
+//     resolverMainFields: ['react-native', 'browser', 'main'],
+//     assetExts: [
+//       ...defaultConfig.resolver.assetExts.filter(ext => ext !== 'xlsx'),
+//       'pem',
+//       'crt',
+//       'key',
+//       'xlsx', // ✅ Add xlsx here
+//     ],
+//     sourceExts: [
+//       ...defaultConfig.resolver.sourceExts,
+//       'mjs',
+//       'cjs',
+//     ],
+//   },
+//   maxWorkers: 2,
+//   resetCache: true,
+// };
+
+// module.exports = mergeConfig(defaultConfig, config);
+
+
 const { getDefaultConfig } = require('expo/metro-config');
 const { mergeConfig } = require('metro-config');
 const path = require('path');
 
 const defaultConfig = getDefaultConfig(__dirname);
 
-// ✅ Safe polyfills for browser compatibility
 const extraNodeModules = {
+  ...defaultConfig.resolver.extraNodeModules,
   '@supabase/postgrest-js': require.resolve('@supabase/postgrest-js'),
   '@radix-ui/react-slot': require.resolve('@radix-ui/react-slot'),
   'merge-options': require.resolve('merge-options'),
-
-  // ✅ Only keep browser-safe polyfills
   stream: require.resolve('stream-browserify'),
   buffer: require.resolve('buffer/'),
   crypto: require.resolve('crypto-browserify'),
@@ -294,11 +384,22 @@ const config = {
     ...defaultConfig.resolver,
     extraNodeModules,
     resolverMainFields: ['react-native', 'browser', 'main'],
-    assetExts: [...defaultConfig.resolver.assetExts, 'pem', 'crt', 'key'],
-    sourceExts: [...defaultConfig.resolver.sourceExts, 'mjs', 'cjs'],
+    assetExts: [
+      ...defaultConfig.resolver.assetExts.filter(ext => ext !== 'xlsx'),
+      'pem',
+      'crt',
+      'key',
+      'xlsx', // ✅ Needed for Excel templates
+    ],
+    sourceExts: [
+      ...defaultConfig.resolver.sourceExts,
+      'mjs',
+      'cjs',
+    ],
   },
   maxWorkers: 2,
   resetCache: true,
 };
 
 module.exports = mergeConfig(defaultConfig, config);
+

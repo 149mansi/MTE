@@ -2758,17 +2758,293 @@
 
 // export default AcademicProgress;  now i am used 14-07-2025 time 12:00 night
 
+// import React, { useState, useEffect, useRef, useCallback } from "react";
+// import {
+//   View,
+//   Text,
+//   TextInput,
+//   StyleSheet,
+//   FlatList,
+//   TouchableOpacity,
+//   ScrollView,
+//   KeyboardAvoidingView,
+//   Platform,
+// } from "react-native";
+// import { useAppData } from "../../contexts/AppDataContext";
+// import { useRouter } from "expo-router";
+
+// const AcademicProgress = () => {
+//   const router = useRouter();
+//   const { sectionData, updateSectionData } = useAppData();
+//   const [rows, setRows] = useState([]);
+//   const hasInitialized = useRef(false);
+
+//   useEffect(() => {
+//     if (!hasInitialized.current) {
+//       hasInitialized.current = true;
+//       const savedAcademicData = Array.isArray(sectionData?.academicProgress)
+//         ? sectionData.academicProgress
+//         : [];
+
+//       const newRows = [
+//         {
+//           id: 1,
+//           subject: "Subject / Activity",
+//           selfAssessment: "Self-assessment",
+//           justification: "Justification",
+//           isHeader: true,
+//         },
+//         ...savedAcademicData.map((item, index) => ({
+//           id: index + 2,
+//           subject: item.subject || "",
+//           selfAssessment: item.selfAssessment || "",
+//           justification: item.justification || "",
+//           isHeader: false,
+//         })),
+//       ];
+
+//       if (newRows.length === 1) {
+//         newRows.push({
+//           id: 2,
+//           subject: "",
+//           selfAssessment: "",
+//           justification: "",
+//           isHeader: false,
+//         });
+//       }
+
+//       setRows(newRows);
+//     }
+//   }, []);
+
+//   const handleSave = useCallback(() => {
+//     const currentRows = rows.filter(row => !row.isHeader);
+//     updateSectionData("academicProgress", currentRows);
+//   }, [rows, updateSectionData]);
+
+//   const handleAddRow = useCallback(() => {
+//     setRows(prev => [
+//       ...prev,
+//       {
+//         id: Date.now(),
+//         subject: "",
+//         selfAssessment: "",
+//         justification: "",
+//         isHeader: false,
+//       },
+//     ]);
+//   }, []);
+
+//   const handleDeleteRow = useCallback((id) => {
+//     setRows(prev => prev.filter(row => row.id !== id));
+//   }, []);
+
+//   const handleInputChange = useCallback((text, field, id) => {
+//     setRows(prev => prev.map(row =>
+//       row.id === id ? { ...row, [field]: text } : row
+//     ));
+//   }, []);
+
+//   const renderRow = useCallback(({ item }) => (
+//     <View style={styles.row}>
+//       <TextInput
+//         style={[styles.input, item.isHeader && styles.headerCell]}
+//         editable={!item.isHeader}
+//         value={item.subject}
+//         onChangeText={(text) => handleInputChange(text, "subject", item.id)}
+//       />
+//       <TextInput
+//         style={[styles.input, item.isHeader && styles.headerCell]}
+//         editable={!item.isHeader}
+//         value={item.selfAssessment}
+//         onChangeText={(text) => handleInputChange(text, "selfAssessment", item.id)}
+//       />
+//       <TextInput
+//         style={[styles.input, item.isHeader && styles.headerCell]}
+//         editable={!item.isHeader}
+//         value={item.justification}
+//         onChangeText={(text) => handleInputChange(text, "justification", item.id)}
+//       />
+//       {!item.isHeader && (
+//         <TouchableOpacity onPress={() => handleDeleteRow(item.id)}>
+//           <Text style={styles.deleteButtonText}>×</Text>
+//         </TouchableOpacity>
+//       )}
+//     </View>
+//   ), [handleInputChange, handleDeleteRow]);
+
+//   const handlePrevious = () => router.push("/home");
+//   const handleNext = () => router.push("/CoCurricularSection");
+
+//   return (
+//     <KeyboardAvoidingView
+//       style={{ flex: 1 }}
+//       behavior={Platform.OS === "ios" ? "padding" : "height"}
+//       keyboardVerticalOffset={100}
+//     >
+//       <ScrollView contentContainerStyle={styles.scrollContainer}>
+//         <View style={styles.container}>
+//           <View style={styles.sectionHeader}>
+//             <Text style={styles.sectionHeaderText}>Academic Progress</Text>
+//           </View>
+
+//           {/* FlatList replaced with direct mapping for better scroll nesting */}
+//           {rows.map(item => (
+//             <View key={item.id.toString()} style={styles.row}>
+//               <TextInput
+//                 style={[styles.input, item.isHeader && styles.headerCell]}
+//                 editable={!item.isHeader}
+//                 value={item.subject}
+//                 onChangeText={(text) => handleInputChange(text, "subject", item.id)}
+//               />
+//               <TextInput
+//                 style={[styles.input, item.isHeader && styles.headerCell]}
+//                 editable={!item.isHeader}
+//                 value={item.selfAssessment}
+//                 onChangeText={(text) => handleInputChange(text, "selfAssessment", item.id)}
+//               />
+//               <TextInput
+//                 style={[styles.input, item.isHeader && styles.headerCell]}
+//                 editable={!item.isHeader}
+//                 value={item.justification}
+//                 onChangeText={(text) => handleInputChange(text, "justification", item.id)}
+//               />
+//               {!item.isHeader && (
+//                 <TouchableOpacity onPress={() => handleDeleteRow(item.id)}>
+//                   <Text style={styles.deleteButtonText}>×</Text>
+//                 </TouchableOpacity>
+//               )}
+//             </View>
+//           ))}
+
+//           <TouchableOpacity style={styles.addButton} onPress={handleAddRow}>
+//             <Text style={styles.buttonText}>+ Add Row</Text>
+//           </TouchableOpacity>
+
+//           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+//             <Text style={styles.buttonText}>Save Changes</Text>
+//           </TouchableOpacity>
+
+//           <View style={styles.navButtons}>
+//             <TouchableOpacity 
+//               style={[styles.navButton, styles.prevButton]}
+//               onPress={handlePrevious}
+//             >
+//               <Text style={styles.navButtonText}>Previous</Text>
+//             </TouchableOpacity>
+//             <TouchableOpacity
+//               style={[styles.navButton, styles.nextButton]}
+//               onPress={handleNext}
+//             >
+//               <Text style={styles.navButtonText}>Next</Text>
+//             </TouchableOpacity>
+//           </View>
+//         </View>
+//       </ScrollView>
+//     </KeyboardAvoidingView>
+//   );
+// };
+
+// const styles = StyleSheet.create({
+//   scrollContainer: {
+//     flexGrow: 1,
+//     backgroundColor: '#f8f9fa',
+//     padding: 20,
+//   },
+//   container: {
+//     flex: 1,
+//   },
+//   sectionHeader: { 
+//     padding: 15, 
+//     backgroundColor: '#e9ecef',
+//     borderRadius: 5,
+//     marginBottom: 10
+//   },
+//   sectionHeaderText: {
+//     fontSize: 18,
+//     fontWeight: 'bold',
+//     textAlign: 'center'
+//   },
+//   row: { 
+//     flexDirection: 'row', 
+//     marginBottom: 8,
+//     alignItems: 'center'
+//   },
+//   input: { 
+//     flex: 1, 
+//     borderWidth: 1, 
+//     borderColor: '#ced4da',
+//     borderRadius: 4,
+//     padding: 10,
+//     marginHorizontal: 4,
+//     backgroundColor: '#fff'
+//   },
+//   headerCell: { 
+//     backgroundColor: '#e9ecef', 
+//     fontWeight: 'bold' 
+//   },
+//   deleteButtonText: { 
+//     color: 'red', 
+//     fontSize: 20,
+//     paddingHorizontal: 10
+//   },
+//   addButton: { 
+//     backgroundColor: '#28a745',
+//     padding: 12,
+//     borderRadius: 5,
+//     alignItems: 'center',
+//     marginVertical: 8
+//   },
+//   saveButton: {
+//     backgroundColor: '#ffc107',
+//     padding: 12,
+//     borderRadius: 5,
+//     alignItems: 'center',
+//     marginBottom: 8
+//   },
+//   navButtons: { 
+//     flexDirection: 'row', 
+//     justifyContent: 'space-between',
+//     marginTop: 10
+//   },
+//   navButton: {
+//     padding: 12,
+//     borderRadius: 5,
+//     flex: 1,
+//     marginHorizontal: 5,
+//     alignItems: 'center'
+//   },
+//   prevButton: { 
+//     backgroundColor: '#6c757d' 
+//   },
+//   nextButton: { 
+//     backgroundColor: '#007bff' 
+//   },
+//   navButtonText: { 
+//     color: '#fff',
+//     fontWeight: 'bold'
+//   },
+//   buttonText: {
+//     color: '#fff',
+//     fontWeight: 'bold'
+//   }
+// });
+
+// export default AcademicProgress;
+
+
+
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
-  FlatList,
   TouchableOpacity,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from "react-native";
 import { useAppData } from "../../contexts/AppDataContext";
 import { useRouter } from "expo-router";
@@ -2777,6 +3053,8 @@ const AcademicProgress = () => {
   const router = useRouter();
   const { sectionData, updateSectionData } = useAppData();
   const [rows, setRows] = useState([]);
+  const [originalData, setOriginalData] = useState([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const hasInitialized = useRef(false);
 
   useEffect(() => {
@@ -2814,12 +3092,15 @@ const AcademicProgress = () => {
       }
 
       setRows(newRows);
+      setOriginalData(JSON.stringify(newRows));
     }
   }, []);
 
   const handleSave = useCallback(() => {
     const currentRows = rows.filter(row => !row.isHeader);
     updateSectionData("academicProgress", currentRows);
+    setOriginalData(JSON.stringify(rows));
+    setHasUnsavedChanges(false);
   }, [rows, updateSectionData]);
 
   const handleAddRow = useCallback(() => {
@@ -2840,41 +3121,33 @@ const AcademicProgress = () => {
   }, []);
 
   const handleInputChange = useCallback((text, field, id) => {
-    setRows(prev => prev.map(row =>
-      row.id === id ? { ...row, [field]: text } : row
-    ));
+    setRows(prev => {
+      const updated = prev.map(row =>
+        row.id === id ? { ...row, [field]: text } : row
+      );
+      return updated;
+    });
   }, []);
 
-  const renderRow = useCallback(({ item }) => (
-    <View style={styles.row}>
-      <TextInput
-        style={[styles.input, item.isHeader && styles.headerCell]}
-        editable={!item.isHeader}
-        value={item.subject}
-        onChangeText={(text) => handleInputChange(text, "subject", item.id)}
-      />
-      <TextInput
-        style={[styles.input, item.isHeader && styles.headerCell]}
-        editable={!item.isHeader}
-        value={item.selfAssessment}
-        onChangeText={(text) => handleInputChange(text, "selfAssessment", item.id)}
-      />
-      <TextInput
-        style={[styles.input, item.isHeader && styles.headerCell]}
-        editable={!item.isHeader}
-        value={item.justification}
-        onChangeText={(text) => handleInputChange(text, "justification", item.id)}
-      />
-      {!item.isHeader && (
-        <TouchableOpacity onPress={() => handleDeleteRow(item.id)}>
-          <Text style={styles.deleteButtonText}>×</Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  ), [handleInputChange, handleDeleteRow]);
+  useEffect(() => {
+    if (hasInitialized.current) {
+      const current = JSON.stringify(rows);
+      setHasUnsavedChanges(current !== originalData);
+    }
+  }, [rows, originalData]);
 
   const handlePrevious = () => router.push("/home");
-  const handleNext = () => router.push("/CoCurricularSection");
+
+  const handleNext = () => {
+    if (hasUnsavedChanges) {
+      Alert.alert(
+        "Unsaved Changes",
+        "Please save your changes before proceeding to the next section."
+      );
+      return;
+    }
+    router.push("/CoCurricularSection");
+  };
 
   return (
     <KeyboardAvoidingView
@@ -2888,7 +3161,6 @@ const AcademicProgress = () => {
             <Text style={styles.sectionHeaderText}>Academic Progress</Text>
           </View>
 
-          {/* FlatList replaced with direct mapping for better scroll nesting */}
           {rows.map(item => (
             <View key={item.id.toString()} style={styles.row}>
               <TextInput
@@ -2926,17 +3198,24 @@ const AcademicProgress = () => {
           </TouchableOpacity>
 
           <View style={styles.navButtons}>
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[styles.navButton, styles.prevButton]}
               onPress={handlePrevious}
             >
               <Text style={styles.navButtonText}>Previous</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
-              style={[styles.navButton, styles.nextButton]}
+              style={[
+                styles.navButton,
+                styles.nextButton,
+                hasUnsavedChanges && { backgroundColor: "#ccc" },
+              ]}
               onPress={handleNext}
             >
-              <Text style={styles.navButtonText}>Next</Text>
+              <Text style={styles.navButtonText}>
+                {hasUnsavedChanges ? "Save to Continue" : "Next"}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
